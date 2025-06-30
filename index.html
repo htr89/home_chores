@@ -2,9 +2,18 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello Electron</title>
+    <title>Home Chores</title>
   </head>
   <body>
-    <h1>Welcome to your Electron App!</h1>
+    <h1>Task Manager</h1>
+    <form id="taskForm">
+      <input type="text" id="name" placeholder="Task name" required />
+      <input type="text" id="assignedTo" placeholder="Assigned to" required />
+      <input type="date" id="dueDate" required />
+      <input type="number" id="points" placeholder="Points" required />
+      <button type="submit">Add Task</button>
+    </form>
+    <ul id="taskList"></ul>
+    <script src="renderer.js"></script>
   </body>
 </html>
