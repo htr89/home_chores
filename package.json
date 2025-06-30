@@ -1,0 +1,13 @@
+{
+  "name": "home_chores",
+  "version": "1.0.0",
+  "description": "Deal with your own chores with a point based system",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0"
+  }
+}
