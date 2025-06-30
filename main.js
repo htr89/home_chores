@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require('electron');
+require('./server');
 const path = require('path');
 
 function createWindow () {
