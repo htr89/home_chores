@@ -5,15 +5,9 @@
     <title>Home Chores</title>
   </head>
   <body>
-    <h1>Task Manager</h1>
-    <form id="taskForm">
-      <input type="text" id="name" placeholder="Task name" required />
-      <input type="text" id="assignedTo" placeholder="Assigned to" required />
-      <input type="date" id="dueDate" required />
-      <input type="number" id="points" placeholder="Points" required />
-      <button type="submit">Add Task</button>
-    </form>
-    <ul id="taskList"></ul>
-    <script src="renderer.js"></script>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="app.jsx"></script>
   </body>
 </html>
