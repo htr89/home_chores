@@ -2,7 +2,7 @@
 
 Deal with your own chores with a point based system.
 
-This repository now includes a minimal [Electron](https://www.electronjs.org/) setup with a small Express backend.
+This repository now includes a minimal [Electron](https://www.electronjs.org/) setup with a small Express backend. The user interface is built with [React](https://reactjs.org/) and is loaded within Electron.
 
 ## Getting Started
 
