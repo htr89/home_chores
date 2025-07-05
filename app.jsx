@@ -7,14 +7,37 @@ const {
     ListItem,
     ListItemText
 } = MaterialUI;
-const {
-    BrowserRouter,
-    Routes,
-    Route,
-    Link,
-    Navigate,
-    useNavigate
-} = ReactRouterDOM;
+
+// Simple hash-based navigation to avoid external router dependency
+const NavigationContext = React.createContext({
+    page: 'create',
+    navigate: () => {}
+});
+
+function NavigationProvider({ children }) {
+    const [page, setPage] = useState(window.location.hash.slice(1) || 'create');
+
+    useEffect(() => {
+        const handler = () => setPage(window.location.hash.slice(1) || 'create');
+        window.addEventListener('hashchange', handler);
+        return () => window.removeEventListener('hashchange', handler);
+    }, []);
+
+    const navigate = (to) => {
+        const target = to.replace(/^#/, '');
+        window.location.hash = `#${target}`;
+    };
+
+    return React.createElement(
+        NavigationContext.Provider,
+        { value: { page, navigate } },
+        children
+    );
+}
+
+function useNavigate() {
+    return React.useContext(NavigationContext).navigate;
+}
 
 function TaskCreate() {
     const navigate = useNavigate();
@@ -33,7 +56,7 @@ function TaskCreate() {
             body: JSON.stringify(data)
         });
         form.reset();
-        navigate('/list');
+        navigate('list');
     };
     return (
         React.createElement(Container, {maxWidth: 'sm'},
@@ -70,24 +93,21 @@ function TaskList() {
 }
 
 function App() {
+    const { page, navigate } = React.useContext(NavigationContext);
     return (
-        React.createElement(BrowserRouter, null,
-            React.createElement('div', {style: {display: 'flex'}},
-                React.createElement('div', {style: {flex: 1, paddingRight: '16px'}},
-                    React.createElement(Routes, null,
-                        React.createElement(Route, {path: '/create', element: React.createElement(TaskCreate)}),
-                        React.createElement(Route, {path: '/list', element: React.createElement(TaskList)}),
-                        React.createElement(Route, {path: '*', element: React.createElement(Navigate, {to: '/create'})})
-                    )
-                ),
-                React.createElement('nav', {style: {width: '200px', borderLeft: '1px solid #ccc', paddingLeft: '16px'}},
-                    React.createElement(List, null,
-                        React.createElement(ListItem, null,
-                            React.createElement(Link, {to: '/create'}, 'Create Task')
-                        ),
-                        React.createElement(ListItem, null,
-                            React.createElement(Link, {to: '/list'}, 'Task List')
-                        )
+        React.createElement('div', {style: {display: 'flex'}},
+            React.createElement('div', {style: {flex: 1, paddingRight: '16px'}},
+                page === 'create' ?
+                    React.createElement(TaskCreate) :
+                    React.createElement(TaskList)
+            ),
+            React.createElement('nav', {style: {width: '200px', borderLeft: '1px solid #ccc', paddingLeft: '16px'}},
+                React.createElement(List, null,
+                    React.createElement(ListItem, null,
+                        React.createElement('a', {href: '#create', onClick: () => navigate('create')}, 'Create Task')
+                    ),
+                    React.createElement(ListItem, null,
+                        React.createElement('a', {href: '#list', onClick: () => navigate('list')}, 'Task List')
                     )
                 )
             )
@@ -95,4 +115,9 @@ function App() {
     );
 }
 
-ReactDOM.render(React.createElement(App), document.getElementById('root'));
+ReactDOM.render(
+    React.createElement(NavigationProvider, null,
+        React.createElement(App)
+    ),
+    document.getElementById('root')
+);
