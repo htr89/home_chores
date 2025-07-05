@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const path = require('path');
 
 const app = express();
@@ -14,6 +15,7 @@ const app = express();
   await db.write();
 
   app.use(express.json());
+  app.use(cors());
 
   require('./routes')(app, db);
 
