@@ -2,7 +2,7 @@
 
 Deal with your own chores with a point based system.
 
-This repository now includes a minimal [Electron](https://www.electronjs.org/) setup with a small Express backend. The user interface is built with [React](https://reactjs.org/) and is loaded within Electron.
+The project now uses [React Native](https://reactnative.dev/) so the UI can run on mobile devices.  A small Express backend is still included to store tasks in a local JSON file.
 
 ## Getting Started
 
@@ -18,4 +18,10 @@ To run the application:
 npm start
 ```
 
-The application will start an Express server on `http://localhost:3000` to store tasks in a local JSON file.
+The `npm start` command launches the React Native development server via [Expo](https://expo.dev/).  In a separate terminal you should run the backend server:
+
+```bash
+node server.js
+```
+
+The backend listens on `http://localhost:3000` to store tasks in a local JSON file.  You can open the Expo URL on your mobile device to interact with the app.

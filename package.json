@@ -2,15 +2,19 @@
   "name": "home_chores",
   "version": "1.0.0",
   "description": "Deal with your own chores with a point based system",
-  "main": "main.js",
+  "main": "App.js",
   "scripts": {
-    "start": "electron .",
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
     "test": "echo \"No tests specified\" && exit 0"
   },
-  "devDependencies": {
-    "electron": "^29.0.0"
-  },
+  "devDependencies": {},
   "dependencies": {
+    "expo": "^49.0.0",
+    "react": "^18.2.0",
+    "react-native": "^0.72.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "lowdb": "^6.0.1",
