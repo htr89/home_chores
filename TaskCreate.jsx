@@ -1,4 +1,4 @@
-const { Container, TextField, Button } = MaterialUI;
+// Access Material UI components directly from the global MaterialUI object
 
 function TaskCreate() {
     const navigate = useNavigate();
@@ -20,14 +20,14 @@ function TaskCreate() {
         navigate('list');
     };
     return (
-        React.createElement(Container, {maxWidth: 'sm'},
+        React.createElement(MaterialUI.Container, {maxWidth: 'sm'},
             React.createElement('h1', null, 'Create Task'),
             React.createElement('form', {id: 'taskForm', onSubmit: handleSubmit},
-                React.createElement(TextField, {label: 'Task name', name: 'name', required: true, fullWidth: true, margin: 'normal'}),
-                React.createElement(TextField, {label: 'Assigned to', name: 'assignedTo', required: true, fullWidth: true, margin: 'normal'}),
-                React.createElement(TextField, {label: 'Due date', name: 'dueDate', type: 'date', InputLabelProps: {shrink: true}, required: true, fullWidth: true, margin: 'normal'}),
-                React.createElement(TextField, {label: 'Points', name: 'points', type: 'number', required: true, fullWidth: true, margin: 'normal'}),
-                React.createElement(Button, {type: 'submit', variant: 'contained', color: 'primary', style: {marginTop: '16px'}}, 'Add Task')
+                React.createElement(MaterialUI.TextField, {label: 'Task name', name: 'name', required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(MaterialUI.TextField, {label: 'Assigned to', name: 'assignedTo', required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(MaterialUI.TextField, {label: 'Due date', name: 'dueDate', type: 'date', InputLabelProps: {shrink: true}, required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(MaterialUI.TextField, {label: 'Points', name: 'points', type: 'number', required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(MaterialUI.Button, {type: 'submit', variant: 'contained', color: 'primary', style: {marginTop: '16px'}}, 'Add Task')
             )
         )
     );
