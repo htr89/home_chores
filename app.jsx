@@ -46,9 +46,10 @@ function App() {
     );
 }
 
-ReactDOM.render(
+// Use the React 18 root API
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
     React.createElement(NavigationProvider, null,
         React.createElement(App)
-    ),
-    document.getElementById('root')
+    )
 );
