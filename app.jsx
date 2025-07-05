@@ -1,4 +1,12 @@
 const { useState, useEffect } = React;
+const {
+    Container,
+    TextField,
+    Button,
+    List,
+    ListItem,
+    ListItemText
+} = MaterialUI;
 
 function App() {
     const [tasks, setTasks] = useState([]);
@@ -33,22 +41,19 @@ function App() {
     };
 
     return (
-        React.createElement('div', null,
+        React.createElement(Container, {maxWidth: 'sm'},
             React.createElement('h1', null, 'Task Manager'),
             React.createElement('form', {id: 'taskForm', onSubmit: handleSubmit},
-                React.createElement('input', {type: 'text', name: 'name', placeholder: 'Task name', required: true}),
-                React.createElement('input', {
-                    type: 'text',
-                    name: 'assignedTo',
-                    placeholder: 'Assigned to',
-                    required: true
-                }),
-                React.createElement('input', {type: 'date', name: 'dueDate', required: true}),
-                React.createElement('input', {type: 'number', name: 'points', placeholder: 'Points', required: true}),
-                React.createElement('button', {type: 'submit'}, 'Add Task')
+                React.createElement(TextField, {label: 'Task name', name: 'name', required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(TextField, {label: 'Assigned to', name: 'assignedTo', required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(TextField, {label: 'Due date', name: 'dueDate', type: 'date', InputLabelProps: {shrink: true}, required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(TextField, {label: 'Points', name: 'points', type: 'number', required: true, fullWidth: true, margin: 'normal'}),
+                React.createElement(Button, {type: 'submit', variant: 'contained', color: 'primary', style: {marginTop: '16px'}}, 'Add Task')
             ),
-            React.createElement('ul', {id: 'taskList'},
-                tasks.map(t => React.createElement('li', {key: t.id}, `${t.name} - ${t.assignedTo} - due ${t.dueDate} - ${t.points} points`))
+            React.createElement(List, {id: 'taskList'},
+                tasks.map(t => React.createElement(ListItem, {key: t.id},
+                    React.createElement(ListItemText, {primary: `${t.name} - ${t.assignedTo}`, secondary: `due ${t.dueDate} - ${t.points} points`})
+                ))
             )
         )
     );
