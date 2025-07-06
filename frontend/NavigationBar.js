@@ -9,6 +9,8 @@ export default function NavigationBar({ navigate }) {
             <Button title="Task List" onPress={() => navigate('list')} />
             <View style={{height: 10}} />
             <Button title="Users" onPress={() => navigate('users')} />
+            <View style={{height: 10}} />
+            <Button title="Calendar" onPress={() => navigate('calendar')} />
         </View>
     );
 }
