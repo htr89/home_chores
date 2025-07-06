@@ -28,6 +28,23 @@ module.exports = (app, db) => {
     res.json(task);
   });
 
+  // Update an existing task
+  app.patch('/tasks/:id', async (req, res) => {
+    const { id } = req.params;
+    await db.read();
+    const task = db.data.tasks.find(t => t.id === id);
+    if (!task) return res.status(404).json({ error: 'task not found' });
+
+    const { name, assignedTo, dueDate, points } = req.body;
+    if (name !== undefined) task.name = name;
+    if (assignedTo !== undefined) task.assignedTo = assignedTo;
+    if (dueDate !== undefined) task.dueDate = dueDate;
+    if (points !== undefined) task.points = Number(points) || 0;
+
+    await db.write();
+    res.json(task);
+  });
+
   app.post('/users', async (req, res) => {
     const { name } = req.body;
     if (!name) return res.status(400).json({ error: 'name required' });
