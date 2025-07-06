@@ -10,12 +10,19 @@ const app = express();
 
     const dbFile  = path.join(__dirname, 'db.json');
     const adapter = new JSONFile(dbFile);
+    const defaultUser = {
+        id: '00000000-0000-0000-0000-000000000000',
+        name: 'System User',
+        totalPoints: 0,
+        completedTasks: 0
+    };
     const defaultData = {
+        users: [defaultUser],
         tasks: [
             {
                 id: '00000000-0000-0000-0000-000000000000',
                 name: 'Test Task',
-                assignedTo: 'System',
+                assignedTo: defaultUser.id,
                 dueDate: new Date().toISOString().split('T')[0],
                 points: 0,
                 createdAt: new Date().toISOString()
@@ -25,7 +32,7 @@ const app = express();
     const db      = new Low(adapter, defaultData);
 
     await db.read();
-    db.data ||= { tasks: [] };
+    db.data ||= { tasks: [], users: [] };
     await db.write();
 
     app.use(cors());
