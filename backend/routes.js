@@ -11,8 +11,36 @@ module.exports = (app, db) => {
     res.json(db.data.users);
   });
 
+  function generateEvents(task) {
+    const events = [];
+    let current = new Date(task.dueDate);
+    const end = new Date(task.endDate || task.dueDate);
+    while (current <= end) {
+      events.push({
+        id: uuidv4(),
+        taskId: task.id,
+        date: current.toISOString().split('T')[0]
+      });
+      if (task.repetition === 'weekly') {
+        current.setDate(current.getDate() + 7);
+      } else if (task.repetition === 'monthly') {
+        current.setMonth(current.getMonth() + 1);
+      } else if (task.repetition === 'yearly') {
+        current.setFullYear(current.getFullYear() + 1);
+      } else {
+        break;
+      }
+    }
+    return events;
+  }
+
+  app.get('/events', async (req, res) => {
+    await db.read();
+    res.json(db.data.events || []);
+  });
+
   app.post('/tasks', async (req, res) => {
-    const { name, assignedTo, dueDate, points } = req.body;
+    const { name, assignedTo, dueDate, points, repetition, endDate } = req.body;
     if (!name) return res.status(400).json({ error: 'name required' });
     const task = {
       id: uuidv4(),
@@ -20,10 +48,13 @@ module.exports = (app, db) => {
       assignedTo,
       dueDate,
       points: Number(points) || 0,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      repetition: repetition || 'none',
+      endDate: endDate || dueDate
     };
     await db.read();
     db.data.tasks.push(task);
+    db.data.events.push(...generateEvents(task));
     await db.write();
     res.json(task);
   });
@@ -35,11 +66,17 @@ module.exports = (app, db) => {
     const task = db.data.tasks.find(t => t.id === id);
     if (!task) return res.status(404).json({ error: 'task not found' });
 
-    const { name, assignedTo, dueDate, points } = req.body;
+    const { name, assignedTo, dueDate, points, repetition, endDate } = req.body;
     if (name !== undefined) task.name = name;
     if (assignedTo !== undefined) task.assignedTo = assignedTo;
     if (dueDate !== undefined) task.dueDate = dueDate;
     if (points !== undefined) task.points = Number(points) || 0;
+    if (repetition !== undefined) task.repetition = repetition;
+    if (endDate !== undefined) task.endDate = endDate;
+
+    // regenerate events for this task
+    db.data.events = db.data.events.filter(e => e.taskId !== id);
+    db.data.events.push(...generateEvents(task));
 
     await db.write();
     res.json(task);
