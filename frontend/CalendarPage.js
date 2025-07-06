@@ -1,52 +1,44 @@
+// CalendarPage.js
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Agenda } from 'react-native-calendars';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 export default function CalendarPage() {
     const [tasks, setTasks] = useState([]);
 
+    // Daten laden
     useEffect(() => {
-        const load = async () => {
-            const res = await fetch('http://localhost:3000/tasks');
-            const data = await res.json();
-            setTasks(data);
-        };
-        load();
+        fetch('http://localhost:3000/tasks')
+            .then(res => res.json())
+            .then(setTasks)
+            .catch(console.error);
     }, []);
 
-    const items = useMemo(() => {
-        const res = {};
-        tasks.forEach(task => {
-            if (!task.dueDate) return;
-            if (!res[task.dueDate]) res[task.dueDate] = [];
-            res[task.dueDate].push(task);
-        });
-        return res;
+    // Nach Datum gruppieren
+    const itemsByDate = useMemo(() => {
+        return tasks.reduce((acc, task) => {
+            if (!task.dueDate) return acc;
+            acc[task.dueDate] = acc[task.dueDate] || [];
+            acc[task.dueDate].push(task);
+            return acc;
+        }, {});
     }, [tasks]);
 
     return (
-        <Agenda
-            items={items}
-            selected={Object.keys(items)[0] || new Date().toISOString().split('T')[0]}
-            renderItem={(item) => (
-                <View style={styles.item}>
-                    <Text>{item.name}</Text>
-                </View>
-            )}
-            renderEmptyData={() => (
-                <View style={styles.empty}><Text>No tasks</Text></View>
-            )}
-        />
+        <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+            <h1>Task Calendar</h1>
+            <Calendar
+                tileContent={({ date }) => {
+                    const key = date.toISOString().split('T')[0];
+                    const dayTasks = itemsByDate[key] || [];
+                    // Zeige Anzahl der Tasks oder gar nichts
+                    return dayTasks.length
+                        ? <span style={{ fontSize: 12, color: '#333' }}>
+                {dayTasks.length} task{dayTasks.length > 1 ? 's' : ''}
+              </span>
+                        : null;
+                }}
+            />
+        </div>
     );
 }
-
-const styles = StyleSheet.create({
-    item: {
-        backgroundColor: '#fff',
-        padding: 10,
-        marginRight: 10,
-        marginTop: 17,
-        borderRadius: 5
-    },
-    empty: { padding: 10 }
-});
