@@ -25,3 +25,15 @@ node backend/server.js
 ```
 
 The backend listens on `http://localhost:3000` to store tasks in a local JSON file.  You can open the Expo URL on your mobile device to interact with the app.
+
+### Loading sample tasks
+
+A small list of example tasks is available under `backend/test_tasks.json`. These
+are **not** loaded automatically. If you want to populate the database with them
+run:
+
+```bash
+node backend/add_test_tasks.js
+```
+
+This script reads the JSON file and appends the tasks to `backend/db.json`.

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Button, FlatList, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import NavigationBar from './NavigationBar';
+import CalendarPage from './CalendarPage';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -154,6 +155,8 @@ export default function App() {
                 <TaskCreate navigate={navigate}/>
             ) : page === 'users' ? (
                 <UsersPage navigate={navigate}/>
+            ) : page === 'calendar' ? (
+                <CalendarPage />
             ) : (
                 <TaskList navigate={navigate}/>
             )}

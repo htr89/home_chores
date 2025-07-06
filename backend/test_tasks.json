@@ -1,0 +1,5 @@
+[
+  {"name": "Clean windows", "assignedTo": "00000000-0000-0000-0000-000000000000", "dueDate": "2024-04-20", "points": 5},
+  {"name": "Mow the lawn", "assignedTo": "00000000-0000-0000-0000-000000000000", "dueDate": "2024-04-23", "points": 8},
+  {"name": "Wash car", "assignedTo": "00000000-0000-0000-0000-000000000000", "dueDate": "2024-05-01", "points": 4}
+]
