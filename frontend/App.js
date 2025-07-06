@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Button, FlatList, StyleSheet} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 import NavigationBar from './NavigationBar';
 
 function TaskList({navigate}) {
@@ -76,12 +77,15 @@ function TaskCreate({navigate}) {
                 onChangeText={setName}
                 style={styles.input}
             />
-            <TextInput
-                placeholder="Assigned user ID"
-                value={assignedTo}
-                onChangeText={setAssignedTo}
+            <Picker
+                selectedValue={assignedTo}
+                onValueChange={setAssignedTo}
                 style={styles.input}
-            />
+            >
+                {users.map(u => (
+                    <Picker.Item key={u.id} label={u.name} value={u.id} />
+                ))}
+            </Picker>
             <TextInput
                 placeholder="Due date (YYYY-MM-DD)"
                 value={dueDate}
