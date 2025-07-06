@@ -14,10 +14,13 @@
   "dependencies": {
     "expo": "^49.0.0",
     "react": "^18.2.0",
-    "react-native": "^0.72.0",
+    "react-native": "0.72.10",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "lowdb": "^6.0.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "react-native-web": "~0.19.6",
+    "react-dom": "18.2.0",
+    "@expo/webpack-config": "^19.0.0"
   }
 }
