@@ -12,6 +12,11 @@ Install dependencies (requires Node.js and npm):
 npm install
 ```
 
+If you see errors about `ViewPropTypes` being undefined when running the web
+version, make sure the optional `deprecated-react-native-prop-types` package is
+installed. It is included in `package.json` and used as a polyfill in
+`frontend/index.js`.
+
 To run the application:
 
 ```bash
