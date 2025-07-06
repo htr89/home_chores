@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+import {DatePickerInput} from 'react-native-paper-dates';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 
@@ -128,10 +129,20 @@ function TaskCreate({navigate}) {
         };
         load();
     }, []);
-    const [dueDate, setDueDate] = useState('');
+    const formatDate = (d) => d.toISOString().split('T')[0];
+    const [dueDate, setDueDate] = useState(formatDate(new Date()));
     const [points, setPoints] = useState('');
     const [repetition, setRepetition] = useState('none');
     const [endDate, setEndDate] = useState('');
+
+    useEffect(() => {
+        if (repetition === 'none') { setEndDate(''); return; }
+        const d = new Date(dueDate);
+        if (repetition === 'weekly') d.setMonth(d.getMonth() + 1);
+        if (repetition === 'monthly') d.setFullYear(d.getFullYear() + 1);
+        if (repetition === 'yearly') d.setFullYear(d.getFullYear() + 5);
+        setEndDate(formatDate(d));
+    }, [dueDate, repetition]);
 
     const handleSubmit = async () => {
         const data = {name, assignedTo, dueDate, points, repetition, endDate};
@@ -142,7 +153,7 @@ function TaskCreate({navigate}) {
         });
         setName('');
         setAssignedTo(users[0] ? users[0].id : '');
-        setDueDate('');
+        setDueDate(formatDate(new Date()));
         setPoints('');
         setRepetition('none');
         setEndDate('');
@@ -167,10 +178,13 @@ function TaskCreate({navigate}) {
                     <Picker.Item key={u.id} label={u.name} value={u.id} />
                 ))}
             </Picker>
-            <TextInput
-                placeholder="Due date (YYYY-MM-DD)"
-                value={dueDate}
-                onChangeText={setDueDate}
+            <DatePickerInput
+                locale="en"
+                label="Due date"
+                value={dueDate ? new Date(dueDate) : undefined}
+                onChange={d => d && setDueDate(formatDate(d))}
+                inputMode="start"
+                inputEnabled
                 style={styles.input}
             />
             <Picker
@@ -183,12 +197,17 @@ function TaskCreate({navigate}) {
                 <Picker.Item label="Monthly" value="monthly" />
                 <Picker.Item label="Yearly" value="yearly" />
             </Picker>
-            <TextInput
-                placeholder="End date (YYYY-MM-DD)"
-                value={endDate}
-                onChangeText={setEndDate}
-                style={styles.input}
-            />
+            {repetition !== 'none' && (
+                <DatePickerInput
+                    locale="en"
+                    label="End date"
+                    value={endDate ? new Date(endDate) : undefined}
+                    onChange={d => d && setEndDate(formatDate(d))}
+                    inputMode="start"
+                    inputEnabled
+                    style={styles.input}
+                />
+            )}
             <TextInput
                 placeholder="Points"
                 value={points}
