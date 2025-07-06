@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Button, FlatList, StyleSheet} from 'react-native';
+import NavigationBar from './NavigationBar';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -25,7 +26,7 @@ function TaskList({navigate}) {
                     </View>
                 )}
             />
-            <Button title="Create Task" onPress={() => navigate('create')}/>
+            {/* Navigation handled by NavigationBar */}
         </View>
     );
 }
@@ -79,8 +80,6 @@ function TaskCreate({navigate}) {
                 style={styles.input}
             />
             <Button title="Add Task" onPress={handleSubmit}/>
-            <View style={{height: 10}}/>
-            <Button title="Task List" onPress={() => navigate('list')}/>
         </View>
     );
 }
@@ -91,6 +90,7 @@ export default function App() {
 
     return (
         <View style={styles.app}>
+            <NavigationBar navigate={navigate} />
             {page === 'create' ? (
                 <TaskCreate navigate={navigate}/>
             ) : (
@@ -101,8 +101,8 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-    app: {flex: 1, padding: 20, paddingTop: 50},
-    container: {flex: 1},
+    app: {flex: 1, flexDirection: 'row', padding: 20, paddingTop: 50},
+    container: {flex: 1, paddingLeft: 20},
     title: {fontSize: 24, marginBottom: 16},
     input: {
         borderWidth: 1,
