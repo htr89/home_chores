@@ -2,7 +2,7 @@
   "name": "home_chores",
   "version": "1.0.0",
   "description": "Deal with your own chores with a point based system",
-  "main": "App.js",
+  "main": "frontend/index.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
