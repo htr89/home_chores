@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, Button, FlatList, StyleSheet} from 'react-native';
+import {View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
@@ -7,34 +7,92 @@ import CalendarPage from './CalendarPage';
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
     const [users, setUsers] = useState({});
-    useEffect(() => {
-        const load = async () => {
-            const res = await fetch('http://localhost:3000/tasks');
-            const data = await res.json();
-            setTasks(data);
-            const resUsers = await fetch('http://localhost:3000/users');
-            const userData = await resUsers.json();
-            const map = {};
-            userData.forEach(u => { map[u.id] = u.name; });
-            setUsers(map);
-        };
-        console.log('🚀 App mounted, loading tasks…');
-        load();
-    }, []);
+
+    const load = async () => {
+        const res = await fetch('http://localhost:3000/tasks');
+        const data = await res.json();
+        setTasks(data);
+        const resUsers = await fetch('http://localhost:3000/users');
+        const userData = await resUsers.json();
+        const map = {};
+        userData.forEach(u => { map[u.id] = u.name; });
+        setUsers(map);
+    };
+
+    useEffect(() => { load(); }, []);
+
+    const renderItem = ({item}) => (
+        <TaskRow item={item} users={users} refresh={load} />
+    );
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Task List</Text>
             <FlatList
                 data={tasks}
                 keyExtractor={(t) => t.id}
-                renderItem={({item}) => (
-                    <View style={styles.item}>
-                        <Text>{item.name} - {users[item.assignedTo] || item.assignedTo}</Text>
-                        <Text style={styles.itemSecondary}>due {item.dueDate} - {item.points} points</Text>
-                    </View>
-                )}
+                renderItem={renderItem}
             />
-            {/* Navigation handled by NavigationBar */}
+        </View>
+    );
+}
+
+function TaskRow({item, users, refresh}) {
+    const [expanded, setExpanded] = useState(false);
+    const [name, setName] = useState(item.name);
+    const [assignedTo, setAssignedTo] = useState(item.assignedTo);
+    const [dueDate, setDueDate] = useState(item.dueDate);
+    const [points, setPoints] = useState(String(item.points));
+
+    const handleSave = async () => {
+        await fetch(`http://localhost:3000/tasks/${item.id}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name, assignedTo, dueDate, points})
+        });
+        setExpanded(false);
+        refresh();
+    };
+
+    return (
+        <View style={styles.item}>
+            <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+                <Text>{item.name} - {users[item.assignedTo] || item.assignedTo}</Text>
+                <Text style={styles.itemSecondary}>due {item.dueDate} - {item.points} points</Text>
+            </TouchableOpacity>
+            {expanded && (
+                <View>
+                    <TextInput
+                        placeholder="Task name"
+                        value={name}
+                        onChangeText={setName}
+                        style={styles.input}
+                    />
+                    <Picker
+                        selectedValue={assignedTo}
+                        onValueChange={setAssignedTo}
+                        style={styles.input}
+                    >
+                        {Object.entries(users).map(([id, uName]) => (
+                            <Picker.Item key={id} label={uName} value={id} />
+                        ))}
+                    </Picker>
+                    <TextInput
+                        placeholder="Due date (YYYY-MM-DD)"
+                        value={dueDate}
+                        onChangeText={setDueDate}
+                        style={styles.input}
+                    />
+                    <TextInput
+                        placeholder="Points"
+                        value={points}
+                        onChangeText={setPoints}
+                        keyboardType="numeric"
+                        style={styles.input}
+                    />
+                    <Button title="Save" onPress={handleSave} />
+                </View>
+            )}
         </View>
     );
 }
