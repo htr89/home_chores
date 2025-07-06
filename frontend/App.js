@@ -43,12 +43,14 @@ function TaskRow({item, users, refresh}) {
     const [assignedTo, setAssignedTo] = useState(item.assignedTo);
     const [dueDate, setDueDate] = useState(item.dueDate);
     const [points, setPoints] = useState(String(item.points));
+    const [repetition, setRepetition] = useState(item.repetition || 'none');
+    const [endDate, setEndDate] = useState(item.endDate || item.dueDate);
 
     const handleSave = async () => {
         await fetch(`http://localhost:3000/tasks/${item.id}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name, assignedTo, dueDate, points})
+            body: JSON.stringify({name, assignedTo, dueDate, points, repetition, endDate})
         });
         setExpanded(false);
         refresh();
@@ -83,6 +85,22 @@ function TaskRow({item, users, refresh}) {
                         onChangeText={setDueDate}
                         style={styles.input}
                     />
+                    <Picker
+                        selectedValue={repetition}
+                        onValueChange={setRepetition}
+                        style={styles.input}
+                    >
+                        <Picker.Item label="No repeat" value="none" />
+                        <Picker.Item label="Weekly" value="weekly" />
+                        <Picker.Item label="Monthly" value="monthly" />
+                        <Picker.Item label="Yearly" value="yearly" />
+                    </Picker>
+                    <TextInput
+                        placeholder="End date (YYYY-MM-DD)"
+                        value={endDate}
+                        onChangeText={setEndDate}
+                        style={styles.input}
+                    />
                     <TextInput
                         placeholder="Points"
                         value={points}
@@ -112,9 +130,11 @@ function TaskCreate({navigate}) {
     }, []);
     const [dueDate, setDueDate] = useState('');
     const [points, setPoints] = useState('');
+    const [repetition, setRepetition] = useState('none');
+    const [endDate, setEndDate] = useState('');
 
     const handleSubmit = async () => {
-        const data = {name, assignedTo, dueDate, points};
+        const data = {name, assignedTo, dueDate, points, repetition, endDate};
         await fetch('http://localhost:3000/tasks', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -124,6 +144,8 @@ function TaskCreate({navigate}) {
         setAssignedTo(users[0] ? users[0].id : '');
         setDueDate('');
         setPoints('');
+        setRepetition('none');
+        setEndDate('');
         navigate('list');
     };
 
@@ -149,6 +171,22 @@ function TaskCreate({navigate}) {
                 placeholder="Due date (YYYY-MM-DD)"
                 value={dueDate}
                 onChangeText={setDueDate}
+                style={styles.input}
+            />
+            <Picker
+                selectedValue={repetition}
+                onValueChange={setRepetition}
+                style={styles.input}
+            >
+                <Picker.Item label="No repeat" value="none" />
+                <Picker.Item label="Weekly" value="weekly" />
+                <Picker.Item label="Monthly" value="monthly" />
+                <Picker.Item label="Yearly" value="yearly" />
+            </Picker>
+            <TextInput
+                placeholder="End date (YYYY-MM-DD)"
+                value={endDate}
+                onChangeText={setEndDate}
                 style={styles.input}
             />
             <TextInput

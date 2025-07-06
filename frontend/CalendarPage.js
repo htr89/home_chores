@@ -4,25 +4,25 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
 export default function CalendarPage() {
-    const [tasks, setTasks] = useState([]);
+    const [events, setEvents] = useState([]);
 
     // Daten laden
     useEffect(() => {
-        fetch('http://localhost:3000/tasks')
+        fetch('http://localhost:3000/events')
             .then(res => res.json())
-            .then(setTasks)
+            .then(setEvents)
             .catch(console.error);
     }, []);
 
     // Nach Datum gruppieren
     const itemsByDate = useMemo(() => {
-        return tasks.reduce((acc, task) => {
-            if (!task.dueDate) return acc;
-            acc[task.dueDate] = acc[task.dueDate] || [];
-            acc[task.dueDate].push(task);
+        return events.reduce((acc, ev) => {
+            if (!ev.date) return acc;
+            acc[ev.date] = acc[ev.date] || [];
+            acc[ev.date].push(ev);
             return acc;
         }, {});
-    }, [tasks]);
+    }, [events]);
 
     return (
         <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
@@ -30,11 +30,10 @@ export default function CalendarPage() {
             <Calendar
                 tileContent={({ date }) => {
                     const key = date.toISOString().split('T')[0];
-                    const dayTasks = itemsByDate[key] || [];
-                    // Zeige Anzahl der Tasks oder gar nichts
-                    return dayTasks.length
+                    const dayEvents = itemsByDate[key] || [];
+                    return dayEvents.length
                         ? <span style={{ fontSize: 12, color: '#333' }}>
-                {dayTasks.length} task{dayTasks.length > 1 ? 's' : ''}
+                {dayEvents.length} event{dayEvents.length > 1 ? 's' : ''}
               </span>
                         : null;
                 }}

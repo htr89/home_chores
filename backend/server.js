@@ -25,14 +25,46 @@ const app = express();
                 assignedTo: defaultUser.id,
                 dueDate: new Date().toISOString().split('T')[0],
                 points: 0,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                repetition: 'none',
+                endDate: new Date().toISOString().split('T')[0]
             }
-        ]
+        ],
+        events: []
     };
     const db      = new Low(adapter, defaultData);
 
     await db.read();
-    db.data ||= { tasks: [], users: [] };
+    db.data ||= { tasks: [], users: [], events: [] };
+    if (!Array.isArray(db.data.events)) db.data.events = [];
+    if (db.data.events.length === 0) {
+        const { v4: uuidv4 } = require('uuid');
+        const generateEvents = (task) => {
+            const events = [];
+            let current = new Date(task.dueDate);
+            const end = new Date(task.endDate || task.dueDate);
+            while (current <= end) {
+                events.push({
+                    id: uuidv4(),
+                    taskId: task.id,
+                    date: current.toISOString().split('T')[0]
+                });
+                if (task.repetition === 'weekly') {
+                    current.setDate(current.getDate() + 7);
+                } else if (task.repetition === 'monthly') {
+                    current.setMonth(current.getMonth() + 1);
+                } else if (task.repetition === 'yearly') {
+                    current.setFullYear(current.getFullYear() + 1);
+                } else {
+                    break;
+                }
+            }
+            return events;
+        };
+        db.data.tasks.forEach(t => {
+            db.data.events.push(...generateEvents(t));
+        });
+    }
     await db.write();
 
     app.use(cors());

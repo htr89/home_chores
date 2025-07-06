@@ -2,6 +2,10 @@
 
 Deal with your own chores with a point based system.
 
+Tasks can repeat weekly, monthly or yearly. When a task is created the server
+generates corresponding **events** for all occurrences until the optional end
+date. The calendar view displays these events rather than the raw tasks.
+
 The project now uses [React Native](https://reactnative.dev/) so the UI can run on mobile devices.  A small Express backend is still included to store tasks in a local JSON file.  The code is organized under `frontend/` and `backend/`.
 
 ## Getting Started
