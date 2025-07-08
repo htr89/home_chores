@@ -261,7 +261,7 @@ function UsersPage({navigate}) {
 
 export default function App() {
     const [page, setPage] = useState('create');
-    const [navOpen, setNavOpen] = useState(true);
+    const [navOpen, setNavOpen] = useState(false);
     const navigate = (to) => setPage(to);
 
     return (
@@ -281,8 +281,8 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-    app: {flex: 1, flexDirection: 'row', padding: 20, paddingTop: 50},
-    container: {flex: 1, paddingLeft: 20},
+    app: {flex: 1, flexDirection: 'row'},
+    container: {flex: 1, padding: 20},
     title: {fontSize: 24, marginBottom: 16},
     input: {
         borderWidth: 1,
