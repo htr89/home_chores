@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {DatePickerInput} from 'react-native-paper-dates';
+import {DatePickerInput, TimePickerModal} from 'react-native-paper-dates';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 
@@ -130,7 +130,10 @@ function TaskCreate({navigate}) {
         load();
     }, []);
     const formatDate = (d) => d.toISOString().split('T')[0];
+    const formatTime = (d) => d.toTimeString().slice(0,5);
     const [dueDate, setDueDate] = useState(formatDate(new Date()));
+    const [dueTime, setDueTime] = useState(formatTime(new Date()));
+    const [timeVisible, setTimeVisible] = useState(false);
     const [points, setPoints] = useState('');
     const [repetition, setRepetition] = useState('none');
     const [endDate, setEndDate] = useState('');
@@ -145,7 +148,8 @@ function TaskCreate({navigate}) {
     }, [dueDate, repetition]);
 
     const handleSubmit = async () => {
-        const data = {name, assignedTo, dueDate, points, repetition, endDate};
+        const dueDateTime = `${dueDate}T${dueTime}`;
+        const data = {name, assignedTo, dueDate: dueDateTime, points, repetition, endDate};
         await fetch('http://localhost:3000/tasks', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -154,6 +158,7 @@ function TaskCreate({navigate}) {
         setName('');
         setAssignedTo(users[0] ? users[0].id : '');
         setDueDate(formatDate(new Date()));
+        setDueTime(formatTime(new Date()));
         setPoints('');
         setRepetition('none');
         setEndDate('');
@@ -186,6 +191,19 @@ function TaskCreate({navigate}) {
                 inputMode="start"
                 inputEnabled
                 style={styles.input}
+            />
+            <Button title={`Time: ${dueTime}`} onPress={() => setTimeVisible(true)} />
+            <TimePickerModal
+                visible={timeVisible}
+                onDismiss={() => setTimeVisible(false)}
+                onConfirm={({hours, minutes}) => {
+                    setTimeVisible(false);
+                    const hh = String(hours).padStart(2, '0');
+                    const mm = String(minutes).padStart(2, '0');
+                    setDueTime(`${hh}:${mm}`);
+                }}
+                hours={parseInt(dueTime.split(':')[0], 10)}
+                minutes={parseInt(dueTime.split(':')[1], 10)}
             />
             <Picker
                 selectedValue={repetition}
