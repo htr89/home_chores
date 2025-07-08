@@ -261,11 +261,12 @@ function UsersPage({navigate}) {
 
 export default function App() {
     const [page, setPage] = useState('create');
+    const [navOpen, setNavOpen] = useState(true);
     const navigate = (to) => setPage(to);
 
     return (
         <View style={styles.app}>
-            <NavigationBar navigate={navigate} />
+            <NavigationBar navigate={navigate} open={navOpen} setOpen={setNavOpen} />
             {page === 'create' ? (
                 <TaskCreate navigate={navigate}/>
             ) : page === 'users' ? (
