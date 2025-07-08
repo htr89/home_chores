@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const migrate = require('./migrate');
 
 const app = express();
 
@@ -17,6 +18,7 @@ const app = express();
         completedTasks: 0
     };
     const defaultData = {
+        migrationVersion: 1,
         users: [defaultUser],
         tasks: [
             {
@@ -36,6 +38,7 @@ const app = express();
 
     await db.read();
     db.data ||= { tasks: [], users: [], events: [] };
+    await migrate(db);
     if (!Array.isArray(db.data.events)) db.data.events = [];
     if (db.data.events.length === 0) {
         const { v4: uuidv4 } = require('uuid');
@@ -43,11 +46,13 @@ const app = express();
             const events = [];
             let current = new Date(task.dueDate);
             const end = new Date(task.endDate || task.dueDate);
+            const time = (task.createdAt || new Date().toISOString()).split('T')[1].slice(0,5);
             while (current <= end) {
                 events.push({
                     id: uuidv4(),
                     taskId: task.id,
-                    date: current.toISOString().split('T')[0]
+                    date: current.toISOString().split('T')[0],
+                    time
                 });
                 if (task.repetition === 'weekly') {
                     current.setDate(current.getDate() + 7);
