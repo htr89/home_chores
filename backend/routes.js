@@ -15,11 +15,13 @@ module.exports = (app, db) => {
     const events = [];
     let current = new Date(task.dueDate);
     const end = new Date(task.endDate || task.dueDate);
+    const time = (task.createdAt || new Date().toISOString()).split('T')[1].slice(0,5);
     while (current <= end) {
       events.push({
         id: uuidv4(),
         taskId: task.id,
-        date: current.toISOString().split('T')[0]
+        date: current.toISOString().split('T')[0],
+        time
       });
       if (task.repetition === 'weekly') {
         current.setDate(current.getDate() + 7);
