@@ -1,7 +1,9 @@
 // CalendarPage.js
 import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, Platform, Button } from 'react-native';
-import { Calendar, Agenda } from 'react-native-calendars';
+import { View, Text, StyleSheet, Button, useWindowDimensions } from 'react-native';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import { Calendar as BigCalendar } from 'react-native-big-calendar';
 
 export default function CalendarPage() {
     const [events, setEvents] = useState([]);
@@ -35,87 +37,72 @@ export default function CalendarPage() {
         }, {});
     }, [events]);
 
-    const markedDates = useMemo(() => {
-        const marks = {};
-        Object.entries(itemsByDate).forEach(([date, list]) => {
-            if (list.length === 0) return;
-            const color = getColor(list.length);
-            marks[date] = {
-                customStyles: {
-                    container: {backgroundColor: color},
-                    text: {color: '#000'}
-                }
+    const tileContent = ({ date }) => {
+        const key = date.toISOString().split('T')[0];
+        const count = (itemsByDate[key] || []).length;
+        if (!count) return null;
+        const color = getColor(count);
+        return (
+            <div style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                backgroundColor: color,
+                opacity: 0.5,
+                pointerEvents: 'none'
+            }}/>
+        );
+    };
+
+    const dailyEvents = useMemo(() => {
+        if (!selectedDate) return [];
+        return (itemsByDate[selectedDate] || []).map(ev => {
+            const start = new Date(`${ev.date}T${ev.time || '00:00'}`);
+            const end = new Date(start.getTime() + 60 * 60 * 1000);
+            return {
+                title: taskMap[ev.taskId]?.name || ev.taskId,
+                start,
+                end
             };
         });
-        if (selectedDate) {
-            marks[selectedDate] = {
-                ...(marks[selectedDate] || {}),
-                selected: true
-            };
-        }
-        return marks;
-    }, [itemsByDate, selectedDate]);
+    }, [selectedDate, itemsByDate, taskMap]);
 
-    const agendaItems = useMemo(() => {
-        const obj = {};
-        Object.entries(itemsByDate).forEach(([date, list]) => {
-            obj[date] = list.map(ev => ({
-                ...ev,
-                name: taskMap[ev.taskId]?.name || ev.taskId
-            }));
-        });
-        if (selectedDate && !obj[selectedDate]) obj[selectedDate] = [];
-        return obj;
-    }, [itemsByDate, taskMap, selectedDate]);
-
-    const renderItem = (item) => (
-        <View style={styles.agendaItem}>
-            <Text>{item.time || ''} - {item.name}</Text>
-        </View>
-    );
-
-    const agendaComponent = (
-        <Agenda
-            items={agendaItems}
-            selected={selectedDate}
-            renderItem={renderItem}
-            renderEmptyData={() => (
-                <View style={styles.agendaItem}><Text>No events</Text></View>
-            )}
-        />
-    );
+    const { width } = useWindowDimensions();
+    const isWide = width >= 768;
 
     const calendarComponent = (
         <Calendar
-            markingType="custom"
-            markedDates={markedDates}
-            onDayPress={day => setSelectedDate(day.dateString)}
-            style={styles.calendar}
+            onClickDay={d => setSelectedDate(d.toISOString().split('T')[0])}
+            tileContent={tileContent}
         />
     );
 
-    const isWeb = Platform.OS === 'web';
-
     return (
         <View style={styles.container}>
-            {isWeb ? (
+            {isWide ? (
                 <View style={styles.webLayout}>
-                    {selectedDate && (
-                        <View style={styles.agendaContainer}>
-                            <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
-                            {agendaComponent}
-                        </View>
-                    )}
-                    {calendarComponent}
+                    <View style={styles.agendaContainer}>
+                        {selectedDate && (
+                            <>
+                                <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
+                                <BigCalendar events={dailyEvents} height={600} mode="day" />
+                            </>
+                        )}
+                    </View>
+                    <div style={{ width: 350 }}>
+                        {calendarComponent}
+                    </div>
                 </View>
             ) : (
                 selectedDate ? (
                     <View style={styles.agendaContainer}>
                         <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
-                        {agendaComponent}
+                        <BigCalendar events={dailyEvents} height={600} mode="day" />
                     </View>
                 ) : (
-                    calendarComponent
+                    <View style={styles.mobileCalendar}>{calendarComponent}</View>
                 )
             )}
         </View>
@@ -135,7 +122,8 @@ const styles = StyleSheet.create({
     webLayout: { flex: 1, flexDirection: 'row' },
     calendar: { alignSelf: 'flex-start' },
     agendaContainer: { flex: 1 },
-    agendaItem: { padding: 10 }
+    agendaItem: { padding: 10 },
+    mobileCalendar: { flex: 1 }
 });
 
 
