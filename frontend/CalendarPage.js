@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, Button, useWindowDimensions } from 'react-native';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import './calendarOverrides.css';
 import { Calendar as BigCalendar } from 'react-native-big-calendar';
 
 export default function CalendarPage() {
