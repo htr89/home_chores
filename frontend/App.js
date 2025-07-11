@@ -1,10 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
-import {Picker} from '@react-native-picker/picker';
-import {DatePickerInput, TimePickerModal} from 'react-native-paper-dates';
+import {View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Button} from 'react-native';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
-import { LOCALE } from './config';
+import TaskForm from './TaskForm';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -24,7 +22,7 @@ function TaskList({navigate}) {
     useEffect(() => { load(); }, []);
 
     const renderItem = ({item}) => (
-        <TaskRow item={item} users={users} refresh={load} />
+        <TaskRow item={item} users={users} onEdit={task => navigate('edit', task)} />
     );
 
     return (
@@ -39,203 +37,15 @@ function TaskList({navigate}) {
     );
 }
 
-function TaskRow({item, users, refresh}) {
-    const [expanded, setExpanded] = useState(false);
-    const [name, setName] = useState(item.name);
-    const [assignedTo, setAssignedTo] = useState(item.assignedTo);
-    const [dueDate, setDueDate] = useState(item.dueDate);
-    const [points, setPoints] = useState(String(item.points));
-    const [repetition, setRepetition] = useState(item.repetition || 'none');
-    const [endDate, setEndDate] = useState(item.endDate || item.dueDate);
-
-    const handleSave = async () => {
-        await fetch(`http://localhost:3000/tasks/${item.id}`, {
-            method: 'PATCH',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name, assignedTo, dueDate, points, repetition, endDate})
-        });
-        setExpanded(false);
-        refresh();
-    };
-
+function TaskRow({item, users, onEdit}) {
     return (
-        <View style={styles.item}>
-            <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-                <Text>{item.name} - {users[item.assignedTo] || item.assignedTo}</Text>
-                <Text style={styles.itemSecondary}>due {item.dueDate} - {item.points} points</Text>
-            </TouchableOpacity>
-            {expanded && (
-                <View>
-                    <TextInput
-                        placeholder="Task name"
-                        value={name}
-                        onChangeText={setName}
-                        style={styles.input}
-                    />
-                    <Picker
-                        selectedValue={assignedTo}
-                        onValueChange={setAssignedTo}
-                        style={styles.input}
-                    >
-                        {Object.entries(users).map(([id, uName]) => (
-                            <Picker.Item key={id} label={uName} value={id} />
-                        ))}
-                    </Picker>
-                    <TextInput
-                        placeholder="Due date (YYYY-MM-DD)"
-                        value={dueDate}
-                        onChangeText={setDueDate}
-                        style={styles.input}
-                    />
-                    <Picker
-                        selectedValue={repetition}
-                        onValueChange={setRepetition}
-                        style={styles.input}
-                    >
-                        <Picker.Item label="No repeat" value="none" />
-                        <Picker.Item label="Weekly" value="weekly" />
-                        <Picker.Item label="Monthly" value="monthly" />
-                        <Picker.Item label="Yearly" value="yearly" />
-                    </Picker>
-                    <TextInput
-                        placeholder="End date (YYYY-MM-DD)"
-                        value={endDate}
-                        onChangeText={setEndDate}
-                        style={styles.input}
-                    />
-                    <TextInput
-                        placeholder="Points"
-                        value={points}
-                        onChangeText={setPoints}
-                        keyboardType="numeric"
-                        style={styles.input}
-                    />
-                    <Button title="Save" onPress={handleSave} />
-                </View>
-            )}
-        </View>
+        <TouchableOpacity onPress={() => onEdit(item)} style={styles.item}>
+            <Text>{item.name} - {users[item.assignedTo] || item.assignedTo}</Text>
+            <Text style={styles.itemSecondary}>due {item.dueDate} - {item.points} points</Text>
+        </TouchableOpacity>
     );
 }
 
-function TaskCreate({navigate}) {
-    const [name, setName] = useState('');
-    const [assignedTo, setAssignedTo] = useState('');
-    const [users, setUsers] = useState([]);
-    useEffect(() => {
-        const load = async () => {
-            const res = await fetch('http://localhost:3000/users');
-            const data = await res.json();
-            setUsers(data);
-            if (data.length > 0) setAssignedTo(data[0].id);
-        };
-        load();
-    }, []);
-    const formatDate = d => d.toLocaleDateString(LOCALE);
-    const formatTime = d => d.toTimeString().slice(0, 5);
-    const [dueDate, setDueDate] = useState(formatDate(new Date()));
-    const [dueTime, setDueTime] = useState(formatTime(new Date()));
-    const [timeVisible, setTimeVisible] = useState(false);
-    const [points, setPoints] = useState('');
-    const [repetition, setRepetition] = useState('none');
-    const [endDate, setEndDate] = useState('');
-
-    useEffect(() => {
-        if (repetition === 'none') { setEndDate(''); return; }
-        const d = new Date(dueDate.split('.').reverse().join('-'));
-        if (repetition === 'weekly') d.setMonth(d.getMonth() + 1);
-        if (repetition === 'monthly') d.setFullYear(d.getFullYear() + 1);
-        if (repetition === 'yearly') d.setFullYear(d.getFullYear() + 5);
-        setEndDate(formatDate(d));
-    }, [dueDate, repetition]);
-
-    const handleSubmit = async () => {
-        const data = { name, assignedTo, dueDate, dueTime, points, repetition, endDate };
-        await fetch('http://localhost:3000/tasks', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        setName('');
-        setAssignedTo(users[0] ? users[0].id : '');
-        setDueDate(formatDate(new Date()));
-        setDueTime(formatTime(new Date()));
-        setPoints('');
-        setRepetition('none');
-        setEndDate('');
-        navigate('list');
-    };
-
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Create Task</Text>
-            <TextInput
-                placeholder="Task name"
-                value={name}
-                onChangeText={setName}
-                style={styles.input}
-            />
-            <Picker
-                selectedValue={assignedTo}
-                onValueChange={setAssignedTo}
-                style={styles.input}
-            >
-                {users.map(u => (
-                    <Picker.Item key={u.id} label={u.name} value={u.id} />
-                ))}
-            </Picker>
-            <DatePickerInput
-                locale={LOCALE}
-                label="Due date"
-                value={dueDate ? new Date(dueDate.split('.').reverse().join('-')) : undefined}
-                onChange={d => setDueDate(formatDate(d))}
-                inputEnabled
-                style={styles.input}
-            />
-            <Button title={`Time: ${dueTime}`} onPress={() => setTimeVisible(true)} />
-            <TimePickerModal
-                locale={LOCALE}
-                visible={timeVisible}
-                onDismiss={() => setTimeVisible(false)}
-                onConfirm={({ hours, minutes }) => {
-                    setTimeVisible(false);
-                    const hh = String(hours).padStart(2, '0');
-                    const mm = String(minutes).padStart(2, '0');
-                    setDueTime(`${hh}:${mm}`);
-                }}
-                hours={parseInt(dueTime.split(':')[0], 10)}
-                minutes={parseInt(dueTime.split(':')[1], 10)}
-            />
-            <Picker
-                selectedValue={repetition}
-                onValueChange={setRepetition}
-                style={styles.input}
-            >
-                <Picker.Item label="No repeat" value="none" />
-                <Picker.Item label="Weekly" value="weekly" />
-                <Picker.Item label="Monthly" value="monthly" />
-                <Picker.Item label="Yearly" value="yearly" />
-            </Picker>
-            {repetition !== 'none' && (
-                <DatePickerInput
-                    locale={LOCALE}
-                    label="End date"
-                    value={endDate ? new Date(endDate.split('.').reverse().join('-')) : undefined}
-                    onChange={d => setEndDate(formatDate(d))}
-                    inputEnabled
-                    style={styles.input}
-                />
-            )}
-            <TextInput
-                placeholder="Points"
-                value={points}
-                onChangeText={setPoints}
-                keyboardType="numeric"
-                style={styles.input}
-            />
-            <Button title="Add Task" onPress={handleSubmit} />
-        </View>
-    );
-}
 
 function UsersPage({navigate}) {
     const [users, setUsers] = useState([]);
@@ -279,13 +89,19 @@ function UsersPage({navigate}) {
 export default function App() {
     const [page, setPage] = useState('create');
     const [navOpen, setNavOpen] = useState(false);
-    const navigate = (to) => setPage(to);
+    const [editingTask, setEditingTask] = useState(null);
+    const navigate = (to, param) => {
+        if (to === 'edit') setEditingTask(param);
+        setPage(to);
+    };
 
     return (
         <View style={styles.app}>
             <NavigationBar navigate={navigate} open={navOpen} setOpen={setNavOpen} />
             {page === 'create' ? (
-                <TaskCreate navigate={navigate}/>
+                <TaskForm navigate={navigate} />
+            ) : page === 'edit' ? (
+                <TaskForm task={editingTask} navigate={navigate} />
             ) : page === 'users' ? (
                 <UsersPage navigate={navigate}/>
             ) : page === 'calendar' ? (
