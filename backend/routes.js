@@ -126,6 +126,31 @@ module.exports = (app, db) => {
         res.json(task);
     });
 
+    // Delete a task and its events
+    app.delete('/tasks/:id', async (req, res) => {
+        const {id} = req.params;
+        await db.read();
+        const idx = db.data.tasks.findIndex(t => t.id === id);
+        if (idx === -1) return res.status(404).json({error: 'task not found'});
+        db.data.tasks.splice(idx, 1);
+        db.data.events = db.data.events.filter(ev => ev.taskId !== id);
+        await db.write();
+        res.json({success: true});
+    });
+
+    // Duplicate a task and immediately generate its events
+    app.post('/tasks/:id/duplicate', async (req, res) => {
+        const {id} = req.params;
+        await db.read();
+        const orig = db.data.tasks.find(t => t.id === id);
+        if (!orig) return res.status(404).json({error: 'task not found'});
+        const copy = {...orig, id: uuidv4(), createdAt: new Date().toISOString()};
+        db.data.tasks.push(copy);
+        db.data.events.push(...generateEvents(copy));
+        await db.write();
+        res.json(copy);
+    });
+
     app.post('/users', async (req, res) => {
         const {name} = req.body;
         if (!name) return res.status(400).json({error: 'name required'});

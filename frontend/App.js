@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Button} from 'react-native';
+import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native';
+import {Card, IconButton} from 'react-native-paper';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 import TaskForm from './TaskForm';
@@ -21,8 +22,24 @@ function TaskList({navigate}) {
 
     useEffect(() => { load(); }, []);
 
+    const handleDuplicate = async (id) => {
+        await fetch(`http://localhost:3000/tasks/${id}/duplicate`, {method: 'POST'});
+        load();
+    };
+
+    const handleDelete = async (id) => {
+        await fetch(`http://localhost:3000/tasks/${id}`, {method: 'DELETE'});
+        load();
+    };
+
     const renderItem = ({item}) => (
-        <TaskRow item={item} users={users} onEdit={task => navigate('edit', task)} />
+        <TaskRow
+            item={item}
+            users={users}
+            onEdit={task => navigate('edit', task)}
+            onDuplicate={handleDuplicate}
+            onDelete={handleDelete}
+        />
     );
 
     return (
@@ -37,12 +54,19 @@ function TaskList({navigate}) {
     );
 }
 
-function TaskRow({item, users, onEdit}) {
+function TaskRow({item, users, onEdit, onDuplicate, onDelete}) {
     return (
-        <TouchableOpacity onPress={() => onEdit(item)} style={styles.item}>
-            <Text>{item.name} - {users[item.assignedTo] || item.assignedTo}</Text>
-            <Text style={styles.itemSecondary}>due {item.dueDate} - {item.points} points</Text>
-        </TouchableOpacity>
+        <Card style={styles.card}>
+            <Card.Title
+                title={item.name}
+                subtitle={`${users[item.assignedTo] || item.assignedTo} • due ${item.dueDate} • ${item.points} pts`}
+            />
+            <Card.Actions>
+                <IconButton icon="pencil" onPress={() => onEdit(item)} />
+                <IconButton icon="content-copy" onPress={() => onDuplicate(item.id)} />
+                <IconButton icon="delete" onPress={() => onDelete(item.id)} />
+            </Card.Actions>
+        </Card>
     );
 }
 
@@ -124,6 +148,5 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 4,
     },
-    item: {paddingVertical: 4},
-    itemSecondary: {color: '#666'},
+    card: {marginBottom: 8},
 });
