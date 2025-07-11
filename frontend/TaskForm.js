@@ -68,24 +68,37 @@ export default function TaskForm({ task, navigate }) {
         onChangeText={setName}
         style={styles.input}
       />
-      <Picker
-        selectedValue={assignedTo}
-        onValueChange={setAssignedTo}
-        style={styles.input}
-      >
-        {users.map(u => (
-          <Picker.Item key={u.id} label={u.name} value={u.id} />
-        ))}
-      </Picker>
-      <DatePickerInput
-        locale={LOCALE}
-        label="Due date"
-        value={dueDate ? new Date(dueDate.split('.').reverse().join('-')) : undefined}
-        onChange={d => setDueDate(formatDate(d))}
-        inputEnabled
-        style={styles.input}
-      />
-      <Button title={`Time: ${dueTime}`} onPress={() => setTimeVisible(true)} />
+      <View style={styles.row}>
+        <Picker
+          selectedValue={assignedTo}
+          onValueChange={setAssignedTo}
+          style={[styles.input, styles.half, styles.spacer]}
+        >
+          {users.map(u => (
+            <Picker.Item key={u.id} label={u.name} value={u.id} />
+          ))}
+        </Picker>
+        <TextInput
+          placeholder="Points"
+          value={points}
+          onChangeText={setPoints}
+          keyboardType="numeric"
+          style={[styles.input, styles.half]}
+        />
+      </View>
+      <View style={styles.row}>
+        <DatePickerInput
+          locale={LOCALE}
+          label="Due date"
+          value={dueDate ? new Date(dueDate.split('.').reverse().join('-')) : undefined}
+          onChange={d => setDueDate(formatDate(d))}
+          inputEnabled
+          style={[styles.input, styles.half, styles.spacer]}
+        />
+        <View style={[styles.half, styles.buttonWrapper]}>
+          <Button title={`Time: ${dueTime}`} onPress={() => setTimeVisible(true)} />
+        </View>
+      </View>
       <TimePickerModal
         locale={LOCALE}
         visible={timeVisible}
@@ -119,13 +132,6 @@ export default function TaskForm({ task, navigate }) {
           style={styles.input}
         />
       )}
-      <TextInput
-        placeholder="Points"
-        value={points}
-        onChangeText={setPoints}
-        keyboardType="numeric"
-        style={styles.input}
-      />
       <Button title={editMode ? 'Save' : 'Add Task'} onPress={handleSubmit} />
     </View>
   );
@@ -137,8 +143,17 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    marginBottom: 12,
+    marginBottom: 8,
     padding: 8,
     borderRadius: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  half: { flex: 1 },
+  spacer: { marginRight: 8 },
+  buttonWrapper: {
+    justifyContent: 'center',
   },
 });
