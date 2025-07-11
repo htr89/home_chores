@@ -1,17 +1,16 @@
-// CalendarPage.js
-import React, { useEffect, useState, useMemo } from 'react';
-import { View, Text, StyleSheet, Button, useWindowDimensions } from 'react-native';
+import React, {useEffect, useState, useMemo} from 'react';
+import {View, Button, StyleSheet, useWindowDimensions} from 'react-native';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './calendarOverrides.css';
-import { Calendar as BigCalendar } from 'react-native-big-calendar';
+import {Calendar as BigCalendar} from 'react-native-big-calendar';
+import {LOCALE} from './config';
 
 export default function CalendarPage() {
     const [events, setEvents] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
 
-    // load events and tasks
     useEffect(() => {
         fetch('http://localhost:3000/events')
             .then(res => res.json())
@@ -25,7 +24,9 @@ export default function CalendarPage() {
 
     const taskMap = useMemo(() => {
         const map = {};
-        tasks.forEach(t => { map[t.id] = t; });
+        tasks.forEach(t => {
+            map[t.id] = t;
+        });
         return map;
     }, [tasks]);
 
@@ -38,8 +39,15 @@ export default function CalendarPage() {
         }, {});
     }, [events]);
 
-    const tileContent = ({ date }) => {
-        const key = date.toISOString().split('T')[0];
+    const dateToISO = date => {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    };
+
+    const tileContent = ({date}) => {
+        const key = dateToISO(date);
         const count = (itemsByDate[key] || []).length;
         if (!count) return null;
         const color = getColor(count);
@@ -59,10 +67,9 @@ export default function CalendarPage() {
 
     const dailyEvents = useMemo(() => {
         if (!selectedDate) return [];
-        const isoDate = convertToISO(selectedDate);
-
-        console.log(isoDate)
+        console.log(selectedDate)
         console.log(itemsByDate)
+        const isoDate = convertToISO(selectedDate);
         return (itemsByDate[isoDate] || []).map(ev => {
             const start = new Date(`${ev.date}T${ev.time || '00:00'}`);
             const end = new Date(start.getTime() + 60 * 60 * 1000);
@@ -74,12 +81,15 @@ export default function CalendarPage() {
         });
     }, [selectedDate, itemsByDate, taskMap]);
 
-    const { width } = useWindowDimensions();
+    const {width} = useWindowDimensions();
     const isWide = width >= 768;
 
     const calendarComponent = (
         <Calendar
-            onClickDay={d => setSelectedDate(d.toLocaleDateString("de-AT"))}
+            locale={LOCALE}
+            onClickDay={dateObj => setSelectedDate(
+                dateObj.toLocaleDateString(LOCALE)
+            )}
             tileContent={tileContent}
         />
     );
@@ -91,24 +101,36 @@ export default function CalendarPage() {
                     <View style={styles.agendaContainer}>
                         {selectedDate && (
                             <>
-                                <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
-                                <BigCalendar events={dailyEvents} height={600} mode="day" date={new Date(
-                                    ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
-                                )}/>
+                                <Button title="Back to calendar" onPress={() => setSelectedDate(null)}/>
+                                <BigCalendar
+                                    locale={LOCALE}
+                                    events={dailyEvents}
+                                    height={600}
+                                    mode="day"
+                                    date={new Date(
+                                        ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
+                                    )}
+                                />
                             </>
                         )}
                     </View>
-                    <div style={{ width: 350 }}>
+                    <div style={{width: 350}}>
                         {calendarComponent}
                     </div>
                 </View>
             ) : (
                 selectedDate ? (
                     <View style={styles.agendaContainer}>
-                        <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
-                        <BigCalendar events={dailyEvents} height={600} mode="day" date={new Date(
-                            ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
-                        )}/>
+                        <Button title="Back to calendar" onPress={() => setSelectedDate(null)}/>
+                        <BigCalendar
+                            locale={LOCALE}
+                            events={dailyEvents}
+                            height={600}
+                            mode="day"
+                            date={new Date(
+                                ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
+                            )}
+                        />
                     </View>
                 ) : (
                     <View style={styles.mobileCalendar}>{calendarComponent}</View>
@@ -119,7 +141,6 @@ export default function CalendarPage() {
 }
 
 function convertToISO(dateStr) {
-    // from "dd.mm.yyyy" to "yyyy-mm-dd"
     const [day, month, year] = dateStr.split('.');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
@@ -127,18 +148,14 @@ function convertToISO(dateStr) {
 function getColor(count) {
     const capped = Math.min(Math.max(count, 0), 10);
     if (capped === 0) return 'transparent';
-    const ratio = capped / 10; // 0 -> green, 1 -> red
-    const hue = 120 - 120 * ratio; // 120=green, 0=red
+    const ratio = capped / 10;
+    const hue = 120 - 120 * ratio;
     return `hsl(${hue}, 70%, 70%)`;
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    webLayout: { flex: 1, flexDirection: 'row' },
-    calendar: { alignSelf: 'flex-start' },
-    agendaContainer: { flex: 1 },
-    agendaItem: { padding: 10 },
-    mobileCalendar: { flex: 1 }
+    container: {flex: 1},
+    webLayout: {flex: 1, flexDirection: 'row'},
+    agendaContainer: {flex: 1},
+    mobileCalendar: {flex: 1}
 });
-
-

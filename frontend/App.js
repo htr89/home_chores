@@ -4,6 +4,7 @@ import {Picker} from '@react-native-picker/picker';
 import {DatePickerInput, TimePickerModal} from 'react-native-paper-dates';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
+import { LOCALE } from './config';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -129,8 +130,8 @@ function TaskCreate({navigate}) {
         };
         load();
     }, []);
-    const formatDate = (d) => d.toLocaleDateString('de-AT');
-    const formatTime = (d) => d.toTimeString().slice(0,5);
+    const formatDate = d => d.toLocaleDateString(LOCALE);
+    const formatTime = d => d.toTimeString().slice(0, 5);
     const [dueDate, setDueDate] = useState(formatDate(new Date()));
     const [dueTime, setDueTime] = useState(formatTime(new Date()));
     const [timeVisible, setTimeVisible] = useState(false);
@@ -140,7 +141,7 @@ function TaskCreate({navigate}) {
 
     useEffect(() => {
         if (repetition === 'none') { setEndDate(''); return; }
-        const d = new Date(dueDate);
+        const d = new Date(dueDate.split('.').reverse().join('-'));
         if (repetition === 'weekly') d.setMonth(d.getMonth() + 1);
         if (repetition === 'monthly') d.setFullYear(d.getFullYear() + 1);
         if (repetition === 'yearly') d.setFullYear(d.getFullYear() + 5);
@@ -148,11 +149,10 @@ function TaskCreate({navigate}) {
     }, [dueDate, repetition]);
 
     const handleSubmit = async () => {
-        const dueDateTime = `${dueDate}T${dueTime}`;
-        const data = {name, assignedTo, dueDate: dueDateTime, points, repetition, endDate};
+        const data = { name, assignedTo, dueDate, dueTime, points, repetition, endDate };
         await fetch('http://localhost:3000/tasks', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         setName('');
@@ -184,19 +184,19 @@ function TaskCreate({navigate}) {
                 ))}
             </Picker>
             <DatePickerInput
-                locale="en"
+                locale={LOCALE}
                 label="Due date"
-                value={dueDate ? new Date(dueDate) : undefined}
-                onChange={d => d && setDueDate(formatDate(d))}
-                inputMode="start"
+                value={dueDate ? new Date(dueDate.split('.').reverse().join('-')) : undefined}
+                onChange={d => setDueDate(formatDate(d))}
                 inputEnabled
                 style={styles.input}
             />
             <Button title={`Time: ${dueTime}`} onPress={() => setTimeVisible(true)} />
             <TimePickerModal
+                locale={LOCALE}
                 visible={timeVisible}
                 onDismiss={() => setTimeVisible(false)}
-                onConfirm={({hours, minutes}) => {
+                onConfirm={({ hours, minutes }) => {
                     setTimeVisible(false);
                     const hh = String(hours).padStart(2, '0');
                     const mm = String(minutes).padStart(2, '0');
@@ -217,11 +217,10 @@ function TaskCreate({navigate}) {
             </Picker>
             {repetition !== 'none' && (
                 <DatePickerInput
-                    locale="en"
+                    locale={LOCALE}
                     label="End date"
-                    value={endDate ? new Date(endDate) : undefined}
-                    onChange={d => d && setEndDate(formatDate(d))}
-                    inputMode="start"
+                    value={endDate ? new Date(endDate.split('.').reverse().join('-')) : undefined}
+                    onChange={d => setEndDate(formatDate(d))}
                     inputEnabled
                     style={styles.input}
                 />
@@ -233,7 +232,7 @@ function TaskCreate({navigate}) {
                 keyboardType="numeric"
                 style={styles.input}
             />
-            <Button title="Add Task" onPress={handleSubmit}/>
+            <Button title="Add Task" onPress={handleSubmit} />
         </View>
     );
 }
