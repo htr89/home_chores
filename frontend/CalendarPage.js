@@ -59,7 +59,11 @@ export default function CalendarPage() {
 
     const dailyEvents = useMemo(() => {
         if (!selectedDate) return [];
-        return (itemsByDate[selectedDate] || []).map(ev => {
+        const isoDate = convertToISO(selectedDate);
+
+        console.log(isoDate)
+        console.log(itemsByDate)
+        return (itemsByDate[isoDate] || []).map(ev => {
             const start = new Date(`${ev.date}T${ev.time || '00:00'}`);
             const end = new Date(start.getTime() + 60 * 60 * 1000);
             return {
@@ -75,7 +79,7 @@ export default function CalendarPage() {
 
     const calendarComponent = (
         <Calendar
-            onClickDay={d => setSelectedDate(d.toISOString().split('T')[0])}
+            onClickDay={d => setSelectedDate(d.toLocaleDateString("de-AT"))}
             tileContent={tileContent}
         />
     );
@@ -88,7 +92,9 @@ export default function CalendarPage() {
                         {selectedDate && (
                             <>
                                 <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
-                                <BigCalendar events={dailyEvents} height={600} mode="day" />
+                                <BigCalendar events={dailyEvents} height={600} mode="day" date={new Date(
+                                    ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
+                                )}/>
                             </>
                         )}
                     </View>
@@ -100,7 +106,9 @@ export default function CalendarPage() {
                 selectedDate ? (
                     <View style={styles.agendaContainer}>
                         <Button title="Back to calendar" onPress={() => setSelectedDate(null)} />
-                        <BigCalendar events={dailyEvents} height={600} mode="day" />
+                        <BigCalendar events={dailyEvents} height={600} mode="day" date={new Date(
+                            ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
+                        )}/>
                     </View>
                 ) : (
                     <View style={styles.mobileCalendar}>{calendarComponent}</View>
@@ -108,6 +116,12 @@ export default function CalendarPage() {
             )}
         </View>
     );
+}
+
+function convertToISO(dateStr) {
+    // from "dd.mm.yyyy" to "yyyy-mm-dd"
+    const [day, month, year] = dateStr.split('.');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 }
 
 function getColor(count) {

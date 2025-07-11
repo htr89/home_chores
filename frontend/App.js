@@ -129,7 +129,7 @@ function TaskCreate({navigate}) {
         };
         load();
     }, []);
-    const formatDate = (d) => d.toISOString().split('T')[0];
+    const formatDate = (d) => d.toLocaleDateString('de-AT');
     const formatTime = (d) => d.toTimeString().slice(0,5);
     const [dueDate, setDueDate] = useState(formatDate(new Date()));
     const [dueTime, setDueTime] = useState(formatTime(new Date()));
