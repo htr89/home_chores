@@ -10,6 +10,7 @@ import EventsPage from './EventsPage';
 import EventForm from './EventForm';
 import LoginPage from './LoginPage';
 import SettingsPage from './SettingsPage';
+import DashboardPage from './DashboardPage';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -125,7 +126,7 @@ function UsersPage({navigate}) {
 }
 
 export default function App() {
-    const [page, setPage] = useState('create');
+    const [page, setPage] = useState('dashboard');
     const [navOpen, setNavOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [eventsTask, setEventsTask] = useState(null);
@@ -188,7 +189,9 @@ export default function App() {
                 setOpen={setNavOpen}
                 onLogout={handleLogout}
             />
-            {page === 'create' ? (
+            {page === 'dashboard' ? (
+                <DashboardPage user={user} />
+            ) : page === 'create' ? (
                 <TaskForm navigate={navigate} />
             ) : page === 'edit' ? (
                 <TaskForm task={editingTask} navigate={navigate} />
