@@ -50,6 +50,7 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
                         />
                     }
                 >
+                    <Menu.Item leadingIcon="cog" onPress={() => { setMenuOpen(false); navigate('settings'); }} title="Settings" />
                     <Menu.Item leadingIcon="logout" onPress={onLogout} title="Log Out" />
                 </Menu>
             </View>

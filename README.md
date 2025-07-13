@@ -53,3 +53,10 @@ Users must authenticate with a simple username/password pair.  New users are
 created with the default password `password`.  On first launch you will be asked
 to log in and can choose to remember the credentials for automatic sign in on
 subsequent launches.
+
+### Settings
+
+Click the user icon in the navigation bar to access the settings page.  Each
+user can configure their personal working hours which control the time range
+displayed in the calendar view.  By default only the hours between 06:00 and
+22:00 are shown.

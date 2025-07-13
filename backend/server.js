@@ -16,10 +16,14 @@ const app = express();
         name: 'System User',
         password: 'password',
         totalScore: 0,
-        completedTasks: 0
+        completedTasks: 0,
+        config: {
+            workingHoursStart: '06:00',
+            workingHoursEnd: '22:00'
+        }
     };
     const defaultData = {
-        migrationVersion: 3,
+        migrationVersion: 5,
         users: [defaultUser],
         tasks: [
             {
@@ -34,7 +38,11 @@ const app = express();
             }
         ],
         events: [],
-        steps: []
+        steps: [],
+        globalConfigurations: {
+            workingHoursStart: '06:00',
+            workingHoursEnd: '22:00'
+        }
     };
     const db      = new Low(adapter, defaultData);
 

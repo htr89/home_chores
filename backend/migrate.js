@@ -1,4 +1,4 @@
-const CURRENT_VERSION = 4;
+const CURRENT_VERSION = 5;
 
 module.exports = async function migrate(db) {
   await db.read();
@@ -63,6 +63,23 @@ module.exports = async function migrate(db) {
       }
     });
     db.data.migrationVersion = 4;
+    await db.write();
+  }
+
+  if (db.data.migrationVersion < 5) {
+    db.data.globalConfigurations = db.data.globalConfigurations || {
+      workingHoursStart: '06:00',
+      workingHoursEnd: '22:00',
+    };
+    db.data.users = db.data.users || [];
+    db.data.users.forEach(u => {
+      u.config = u.config || {};
+      if (!u.config.workingHoursStart)
+        u.config.workingHoursStart = db.data.globalConfigurations.workingHoursStart;
+      if (!u.config.workingHoursEnd)
+        u.config.workingHoursEnd = db.data.globalConfigurations.workingHoursEnd;
+    });
+    db.data.migrationVersion = 5;
     await db.write();
   }
 };
