@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Drawer, IconButton, Tooltip } from 'react-native-paper';
+import { Drawer, IconButton, Tooltip, Menu } from 'react-native-paper';
 
-export default function NavigationBar({ navigate, open, setOpen }) {
+export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
     const items = [
         {key: 'create', label: 'Add Task', icon: 'plus'},
         {key: 'list', label: 'Task List', icon: 'format-list-bulleted'},
@@ -10,8 +10,10 @@ export default function NavigationBar({ navigate, open, setOpen }) {
         {key: 'calendar', label: 'Calendar', icon: 'calendar'},
     ];
 
+    const [menuOpen, setMenuOpen] = React.useState(false);
+
     return (
-        <View style={[styles.nav, {width: open ? 160 : 72}]}> 
+        <View style={[styles.nav, {width: open ? 200 : 80}]}>
             <IconButton
                 icon={open ? 'chevron-left' : 'chevron-right'}
                 onPress={() => setOpen(!open)}
@@ -36,6 +38,21 @@ export default function NavigationBar({ navigate, open, setOpen }) {
                     )
                 ))}
             </Drawer.Section>
+            <View style={styles.userMenu}>
+                <Menu
+                    visible={menuOpen}
+                    onDismiss={() => setMenuOpen(false)}
+                    anchor={
+                        <IconButton
+                            icon="account-circle"
+                            size={open ? 32 : 24}
+                            onPress={() => setMenuOpen(true)}
+                        />
+                    }
+                >
+                    <Menu.Item leadingIcon="logout" onPress={onLogout} title="Log Out" />
+                </Menu>
+            </View>
         </View>
     );
 }
@@ -47,5 +64,9 @@ const styles = StyleSheet.create({
     },
     toggle: {
         alignSelf: 'flex-end',
+    },
+    userMenu: {
+        alignItems: 'center',
+        marginBottom: 8,
     },
 });

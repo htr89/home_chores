@@ -154,6 +154,14 @@ export default function App() {
         setPage(to);
     };
 
+    const handleLogout = () => {
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem('login');
+        }
+        setUser(null);
+        setNavOpen(false);
+    };
+
     if (checkingLogin) {
         return <View style={styles.app}/>;
     }
@@ -164,7 +172,12 @@ export default function App() {
 
     return (
         <View style={styles.app}>
-            <NavigationBar navigate={navigate} open={navOpen} setOpen={setNavOpen} />
+            <NavigationBar
+                navigate={navigate}
+                open={navOpen}
+                setOpen={setNavOpen}
+                onLogout={handleLogout}
+            />
             {page === 'create' ? (
                 <TaskForm navigate={navigate} />
             ) : page === 'edit' ? (
