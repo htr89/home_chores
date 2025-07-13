@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 import { IconButton } from 'react-native-paper';
-import Tile from './Tile';
-import { EVENT_COLOR } from './colors';
+import Tile from '../components/Tile';
+import { EVENT_COLOR } from '../utils/colors';
 
 export default function EventsPage({task, navigate}) {
     const [events, setEvents] = useState([]);

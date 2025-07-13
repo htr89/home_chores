@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Button, StyleSheet } from 'react-native';
 import { TimePickerModal } from 'react-native-paper-dates';
-import HomeChoresFormComponent from './HomeChoresFormComponent';
+import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
 
 export default function SettingsPage({ user, setUser, navigate }) {
   const [start, setStart] = useState(user.config?.workingHoursStart || '06:00');
