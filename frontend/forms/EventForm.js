@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput } from 'react-native-paper-dates';
-import HomeChoresFormComponent from './HomeChoresFormComponent';
-import { LOCALE } from './config';
+import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
+import { LOCALE } from '../utils/config';
 
 /**
  * Form for editing a single event.  It reuses the generic

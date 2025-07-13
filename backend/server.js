@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const migrate = require('./migrate');
+const migrate = require('./scripts/migrate');
 
 const app = express();
 

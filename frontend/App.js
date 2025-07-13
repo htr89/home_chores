@@ -1,16 +1,16 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native';
 import { IconButton } from 'react-native-paper';
-import Tile from './Tile';
-import { TASK_COLOR, USER_COLOR } from './colors';
-import NavigationBar from './NavigationBar';
-import CalendarPage from './CalendarPage';
-import TaskForm from './TaskForm';
-import EventsPage from './EventsPage';
-import EventForm from './EventForm';
-import LoginPage from './LoginPage';
-import SettingsPage from './SettingsPage';
-import DashboardPage from './DashboardPage';
+import Tile from './components/Tile';
+import { TASK_COLOR, USER_COLOR } from './utils/colors';
+import NavigationBar from './components/NavigationBar';
+import CalendarPage from './pages/CalendarPage';
+import TaskForm from './forms/TaskForm';
+import EventsPage from './pages/EventsPage';
+import EventForm from './forms/EventForm';
+import LoginPage from './pages/LoginPage';
+import SettingsPage from './pages/SettingsPage';
+import DashboardPage from './pages/DashboardPage';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);

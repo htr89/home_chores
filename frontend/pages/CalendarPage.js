@@ -2,9 +2,9 @@ import React, {useEffect, useState, useMemo} from 'react';
 import {View, Button, StyleSheet, useWindowDimensions} from 'react-native';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import './calendarOverrides.css';
+import '../styles/calendarOverrides.css';
 import {Calendar as BigCalendar} from 'react-native-big-calendar';
-import {LOCALE} from './config';
+import {LOCALE} from '../utils/config';
 
 export default function CalendarPage({ navigate, user, globalConfig }) {
     const [events, setEvents] = useState([]);

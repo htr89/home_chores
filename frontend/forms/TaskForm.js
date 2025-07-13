@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput, TimePickerModal } from 'react-native-paper-dates';
-import { LOCALE } from './config';
-import HomeChoresFormComponent from './HomeChoresFormComponent';
+import { LOCALE } from '../utils/config';
+import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
 
 export default function TaskForm({ task, navigate }) {
   const editMode = !!task;
