@@ -30,7 +30,13 @@ module.exports = (app, db) => {
 
     app.get('/users', async (req, res) => {
         await db.read();
-        res.json(db.data.users);
+        const users = db.data.users.map(u => ({...u}));
+        users.forEach(u => {
+            const events = (db.data.events || []).filter(ev => ev.assignedTo === u.id && ev.state === 'completed');
+            u.completedTasks = events.length;
+            u.totalScore = events.reduce((sum, ev) => sum + (ev.points || 0), 0);
+        });
+        res.json(users);
     });
 
     function generateEvents(task) {
@@ -45,7 +51,8 @@ module.exports = (app, db) => {
                 date: current.toISOString().split('T')[0],
                 time,
                 assignedTo: task.assignedTo,
-                state: 'created'
+                state: 'created',
+                points: task.points || 0
             });
             if (task.repetition === 'weekly') {
                 current.setDate(current.getDate() + 7);
@@ -208,18 +215,8 @@ module.exports = (app, db) => {
         }
         if (time !== undefined) ev.time = time;
         if (assignedTo !== undefined) ev.assignedTo = assignedTo;
-        let completed = false;
         if (state !== undefined) {
-            if (state === 'completed' && ev.state !== 'completed') completed = true;
             ev.state = state;
-        }
-        if (completed) {
-            const user = db.data.users.find(u => u.id === ev.assignedTo);
-            const task = db.data.tasks.find(t => t.id === ev.taskId);
-            if (user && task) {
-                user.completedTasks = (user.completedTasks || 0) + 1;
-                user.totalScore = (user.totalScore || 0) + (task.points || 0);
-            }
         }
         await db.write();
         res.json(ev);
