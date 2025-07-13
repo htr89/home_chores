@@ -4,6 +4,7 @@ import {Card, IconButton} from 'react-native-paper';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 import TaskForm from './TaskForm';
+import EventsPage from './EventsPage';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -39,6 +40,7 @@ function TaskList({navigate}) {
             onEdit={task => navigate('edit', task)}
             onDuplicate={handleDuplicate}
             onDelete={handleDelete}
+            navigate={navigate}
         />
     );
 
@@ -54,7 +56,7 @@ function TaskList({navigate}) {
     );
 }
 
-function TaskRow({item, users, onEdit, onDuplicate, onDelete}) {
+function TaskRow({item, users, onEdit, onDuplicate, onDelete, navigate}) {
     return (
         <Card style={styles.card}>
             <Card.Title
@@ -64,6 +66,7 @@ function TaskRow({item, users, onEdit, onDuplicate, onDelete}) {
             <Card.Actions>
                 <IconButton icon="pencil" onPress={() => onEdit(item)} />
                 <IconButton icon="content-copy" onPress={() => onDuplicate(item.id)} />
+                <IconButton icon="calendar" onPress={() => navigate('events', item)} />
                 <IconButton icon="delete" onPress={() => onDelete(item.id)} />
             </Card.Actions>
         </Card>
@@ -114,8 +117,10 @@ export default function App() {
     const [page, setPage] = useState('create');
     const [navOpen, setNavOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
+    const [eventsTask, setEventsTask] = useState(null);
     const navigate = (to, param) => {
         if (to === 'edit') setEditingTask(param);
+        if (to === 'events') setEventsTask(param);
         setPage(to);
     };
 
@@ -130,6 +135,8 @@ export default function App() {
                 <UsersPage navigate={navigate}/>
             ) : page === 'calendar' ? (
                 <CalendarPage />
+            ) : page === 'events' ? (
+                <EventsPage task={eventsTask} navigate={navigate}/>
             ) : (
                 <TaskList navigate={navigate}/>
             )}
