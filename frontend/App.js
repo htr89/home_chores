@@ -7,6 +7,7 @@ import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 import TaskForm from './TaskForm';
 import EventsPage from './EventsPage';
+import EventForm from './EventForm';
 import LoginPage from './LoginPage';
 
 function TaskList({navigate}) {
@@ -127,6 +128,8 @@ export default function App() {
     const [navOpen, setNavOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [eventsTask, setEventsTask] = useState(null);
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [eventOrigin, setEventOrigin] = useState(null);
     const [user, setUser] = useState(null);
     const [checkingLogin, setCheckingLogin] = useState(true);
 
@@ -147,6 +150,7 @@ export default function App() {
     const navigate = (to, param) => {
         if (to === 'edit') setEditingTask(param);
         if (to === 'events') setEventsTask(param);
+        if (to === 'event-edit') { setEditingEvent(param.event); setEventOrigin(param.origin); }
         setPage(to);
     };
 
@@ -168,9 +172,11 @@ export default function App() {
             ) : page === 'users' ? (
                 <UsersPage navigate={navigate}/>
             ) : page === 'calendar' ? (
-                <CalendarPage />
+                <CalendarPage navigate={navigate} />
             ) : page === 'events' ? (
                 <EventsPage task={eventsTask} navigate={navigate}/>
+            ) : page === 'event-edit' ? (
+                <EventForm event={editingEvent} navigateBack={() => navigate(eventOrigin, eventsTask)} />
             ) : (
                 <TaskList navigate={navigate}/>
             )}
