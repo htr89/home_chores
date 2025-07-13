@@ -14,11 +14,12 @@ const app = express();
     const defaultUser = {
         id: '00000000-0000-0000-0000-000000000000',
         name: 'System User',
-        totalPoints: 0,
+        password: 'password',
+        totalScore: 0,
         completedTasks: 0
     };
     const defaultData = {
-        migrationVersion: 1,
+        migrationVersion: 2,
         users: [defaultUser],
         tasks: [
             {

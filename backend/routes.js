@@ -176,17 +176,28 @@ module.exports = (app, db) => {
     });
 
     app.post('/users', async (req, res) => {
-        const {name} = req.body;
+        const {name, password} = req.body;
         if (!name) return res.status(400).json({error: 'name required'});
         const user = {
             id: uuidv4(),
             name,
-            totalPoints: 0,
+            password: password || 'password',
+            totalScore: 0,
             completedTasks: 0
         };
         await db.read();
         db.data.users.push(user);
         await db.write();
-        res.json(user);
+        const {password: pw, ...safeUser} = user;
+        res.json(safeUser);
+    });
+
+    app.post('/login', async (req, res) => {
+        const {name, password} = req.body;
+        await db.read();
+        const user = db.data.users.find(u => u.name === name && u.password === password);
+        if (!user) return res.status(401).json({error: 'invalid credentials'});
+        const {password: pw, ...safeUser} = user;
+        res.json(safeUser);
     });
 };

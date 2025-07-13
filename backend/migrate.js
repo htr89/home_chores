@@ -1,4 +1,4 @@
-const CURRENT_VERSION = 1;
+const CURRENT_VERSION = 2;
 
 module.exports = async function migrate(db) {
   await db.read();
@@ -16,6 +16,27 @@ module.exports = async function migrate(db) {
       }
     });
     db.data.migrationVersion = 1;
+    await db.write();
+  }
+
+  if (db.data.migrationVersion < 2) {
+    db.data.users = db.data.users || [];
+    db.data.users.forEach(u => {
+      if (u.totalPoints !== undefined && u.totalScore === undefined) {
+        u.totalScore = u.totalPoints;
+        delete u.totalPoints;
+      }
+      if (u.password === undefined) {
+        u.password = 'password';
+      }
+      if (u.completedTasks === undefined) {
+        u.completedTasks = 0;
+      }
+      if (u.totalScore === undefined) {
+        u.totalScore = 0;
+      }
+    });
+    db.data.migrationVersion = 2;
     await db.write();
   }
 };
