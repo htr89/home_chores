@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput, TimePickerModal } from 'react-native-paper-dates';
 import { LOCALE } from './config';
+import HomeChoresFormComponent from './HomeChoresFormComponent';
 
 export default function TaskForm({ task, navigate }) {
   const editMode = !!task;
@@ -48,7 +49,7 @@ export default function TaskForm({ task, navigate }) {
     setEndDate(formatDate(d));
   }, [dueDate, repetition]);
 
-  const handleSubmit = async () => {
+  const saveTask = async () => {
     const data = { name, assignedTo, dueDate, dueTime, points, repetition, endDate };
     if (editMode) {
       await fetch(`http://localhost:3000/tasks/${task.id}`, {
@@ -72,6 +73,10 @@ export default function TaskForm({ task, navigate }) {
         });
       }
     }
+  };
+
+  const handleSubmit = async () => {
+    await saveTask();
     navigate('list');
   };
 
@@ -102,8 +107,12 @@ export default function TaskForm({ task, navigate }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{editMode ? 'Edit Task' : 'Create Task'}</Text>
+    <HomeChoresFormComponent
+      title={editMode ? 'Edit Task' : 'Create Task'}
+      onCancel={() => navigate('list')}
+      onSubmit={handleSubmit}
+      submitLabel={editMode ? 'Save' : 'Add Task'}
+    >
       <TextInput
         placeholder="Task name"
         value={name}
@@ -194,14 +203,11 @@ export default function TaskForm({ task, navigate }) {
           <Button title="Add" onPress={addStep} />
         </View>
       </View>
-      <Button title={editMode ? 'Save' : 'Add Task'} onPress={handleSubmit} />
-    </View>
+    </HomeChoresFormComponent>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, marginBottom: 16 },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',

@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native';
+import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 import { IconButton } from 'react-native-paper';
-import {DatePickerInput} from 'react-native-paper-dates';
-import {LOCALE} from './config';
 import Tile from './Tile';
 import { EVENT_COLOR } from './colors';
 
@@ -17,14 +15,6 @@ export default function EventsPage({task, navigate}) {
 
     useEffect(() => { load(); }, []);
 
-    const handleSave = async (id, changes) => {
-        await fetch(`http://localhost:3000/events/${id}`, {
-            method: 'PATCH',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(changes)
-        });
-        load();
-    };
 
     const handleComplete = async (id) => {
         await fetch(`http://localhost:3000/events/${id}`, {
@@ -36,7 +26,7 @@ export default function EventsPage({task, navigate}) {
     };
 
     const renderItem = ({item}) => (
-        <EventRow item={item} onSave={handleSave} onComplete={handleComplete}/>
+        <EventRow item={item} onComplete={handleComplete} navigate={navigate} />
     );
 
     return (
@@ -52,25 +42,11 @@ export default function EventsPage({task, navigate}) {
     );
 }
 
-function EventRow({item, onSave, onComplete}) {
-    const [date, setDate] = useState(item.date);
-    const [time, setTime] = useState(item.time);
-    const [editMode, setEditMode] = useState(false);
-
-    const save = () => {
-        onSave(item.id, {date, time});
-        setEditMode(false);
-    };
-
-    const actions = editMode ? (
-        <>
-            <Button title="Save" onPress={save} />
-            <Button title="Cancel" onPress={() => setEditMode(false)} />
-        </>
-    ) : (
+function EventRow({item, onComplete, navigate}) {
+    const actions = (
         <>
             <IconButton icon="check" onPress={() => onComplete(item.id)} disabled={item.state === 'completed'} />
-            <IconButton icon="pencil" onPress={() => setEditMode(true)} />
+            <IconButton icon="pencil" onPress={() => navigate('event-edit', { event: item, origin: 'events' })} />
         </>
     );
 
@@ -79,37 +55,11 @@ function EventRow({item, onSave, onComplete}) {
             title={`${item.date} ${item.time}${item.state === 'completed' ? ' (completed)' : ''}`}
             color={EVENT_COLOR}
             actions={actions}
-        >
-            {editMode && (
-                <>
-                    <DatePickerInput
-                        locale={LOCALE}
-                        label="Date"
-                        value={new Date(date)}
-                        onChange={d => setDate(d.toISOString().split('T')[0])}
-                        inputEnabled
-                        style={styles.input}
-                    />
-                    <TextInput
-                        value={time}
-                        onChangeText={setTime}
-                        style={styles.input}
-                        placeholder="HH:MM"
-                    />
-                </>
-            )}
-        </Tile>
+        />
     );
 }
 
 const styles = StyleSheet.create({
     container: {flex: 1, padding: 20},
-    title: {fontSize: 24, marginBottom: 16},
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        marginBottom: 8,
-        padding: 8,
-        borderRadius: 4,
-    }
+    title: {fontSize: 24, marginBottom: 16}
 });

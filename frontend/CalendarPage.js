@@ -6,7 +6,7 @@ import './calendarOverrides.css';
 import {Calendar as BigCalendar} from 'react-native-big-calendar';
 import {LOCALE} from './config';
 
-export default function CalendarPage() {
+export default function CalendarPage({ navigate }) {
     const [events, setEvents] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -67,13 +67,12 @@ export default function CalendarPage() {
 
     const dailyEvents = useMemo(() => {
         if (!selectedDate) return [];
-        console.log(selectedDate)
-        console.log(itemsByDate)
         const isoDate = convertToISO(selectedDate);
         return (itemsByDate[isoDate] || []).map(ev => {
             const start = new Date(`${ev.date}T${ev.time || '00:00'}`);
             const end = new Date(start.getTime() + 60 * 60 * 1000);
             return {
+                id: ev.id,
                 title: taskMap[ev.taskId]?.name || ev.taskId,
                 start,
                 end
@@ -110,6 +109,11 @@ export default function CalendarPage() {
                                     date={new Date(
                                         ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
                                     )}
+                                    onPressEvent={e => {
+                                        const iso = convertToISO(selectedDate);
+                                        const orig = (itemsByDate[iso] || []).find(ev => ev.id === e.id);
+                                        if (orig) navigate('event-edit', { event: orig, origin: 'calendar' });
+                                    }}
                                 />
                             </>
                         )}
@@ -130,6 +134,11 @@ export default function CalendarPage() {
                             date={new Date(
                                 ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
                             )}
+                            onPressEvent={e => {
+                                const iso = convertToISO(selectedDate);
+                                const orig = (itemsByDate[iso] || []).find(ev => ev.id === e.id);
+                                if (orig) navigate('event-edit', { event: orig, origin: 'calendar' });
+                            }}
                         />
                     </View>
                 ) : (
