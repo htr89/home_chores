@@ -4,6 +4,7 @@ import { Drawer, IconButton, Tooltip, Menu } from 'react-native-paper';
 
 export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
     const items = [
+        {key: 'dashboard', label: 'Dashboard', icon: 'view-dashboard'},
         {key: 'create', label: 'Add Task', icon: 'plus'},
         {key: 'list', label: 'Task List', icon: 'format-list-bulleted'},
         {key: 'users', label: 'Users', icon: 'account-group'},
