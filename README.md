@@ -46,3 +46,10 @@ node backend/add_test_tasks.js
 ```
 
 This script reads the JSON file and appends the tasks to `backend/db.json`.
+
+### Login
+
+Users must authenticate with a simple username/password pair.  New users are
+created with the default password `password`.  On first launch you will be asked
+to log in and can choose to remember the credentials for automatic sign in on
+subsequent launches.

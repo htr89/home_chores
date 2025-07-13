@@ -5,6 +5,7 @@ import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 import TaskForm from './TaskForm';
 import EventsPage from './EventsPage';
+import LoginPage from './LoginPage';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -99,7 +100,7 @@ function UsersPage({navigate}) {
                 data={users}
                 keyExtractor={(u) => u.id}
                 renderItem={({item}) => (
-                    <Text>{item.name} - {item.totalPoints} pts - {item.completedTasks} tasks</Text>
+                    <Text>{item.name} - {item.totalScore} pts - {item.completedTasks} tasks</Text>
                 )}
             />
             <TextInput
@@ -118,11 +119,36 @@ export default function App() {
     const [navOpen, setNavOpen] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [eventsTask, setEventsTask] = useState(null);
+    const [user, setUser] = useState(null);
+    const [checkingLogin, setCheckingLogin] = useState(true);
+
+    useEffect(() => {
+        const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('login') : null;
+        if (!saved) { setCheckingLogin(false); return; }
+        const {name, password} = JSON.parse(saved);
+        fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({name, password})
+        })
+            .then(res => res.ok ? res.json() : null)
+            .then(u => { setUser(u); setCheckingLogin(false); })
+            .catch(() => setCheckingLogin(false));
+    }, []);
+
     const navigate = (to, param) => {
         if (to === 'edit') setEditingTask(param);
         if (to === 'events') setEventsTask(param);
         setPage(to);
     };
+
+    if (checkingLogin) {
+        return <View style={styles.app}/>;
+    }
+
+    if (!user) {
+        return <LoginPage onLogin={setUser}/>;
+    }
 
     return (
         <View style={styles.app}>
