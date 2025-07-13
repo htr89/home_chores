@@ -26,8 +26,17 @@ export default function EventsPage({task, navigate}) {
         load();
     };
 
+    const handleComplete = async (id) => {
+        await fetch(`http://localhost:3000/events/${id}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({state: 'completed'})
+        });
+        load();
+    };
+
     const renderItem = ({item}) => (
-        <EventRow item={item} onSave={handleSave}/>
+        <EventRow item={item} onSave={handleSave} onComplete={handleComplete}/>
     );
 
     return (
@@ -43,7 +52,7 @@ export default function EventsPage({task, navigate}) {
     );
 }
 
-function EventRow({item, onSave}) {
+function EventRow({item, onSave, onComplete}) {
     const [date, setDate] = useState(item.date);
     const [time, setTime] = useState(item.time);
     const [editMode, setEditMode] = useState(false);
@@ -59,12 +68,15 @@ function EventRow({item, onSave}) {
             <Button title="Cancel" onPress={() => setEditMode(false)} />
         </>
     ) : (
-        <IconButton icon="pencil" onPress={() => setEditMode(true)} />
+        <>
+            <IconButton icon="check" onPress={() => onComplete(item.id)} disabled={item.state === 'completed'} />
+            <IconButton icon="pencil" onPress={() => setEditMode(true)} />
+        </>
     );
 
     return (
         <Tile
-            title={`${item.date} ${item.time}`}
+            title={`${item.date} ${item.time}${item.state === 'completed' ? ' (completed)' : ''}`}
             color={EVENT_COLOR}
             actions={actions}
         >

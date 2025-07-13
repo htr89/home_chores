@@ -43,7 +43,9 @@ module.exports = (app, db) => {
                 id: uuidv4(),
                 taskId: task.id,
                 date: current.toISOString().split('T')[0],
-                time
+                time,
+                assignedTo: task.assignedTo,
+                state: 'created'
             });
             if (task.repetition === 'weekly') {
                 current.setDate(current.getDate() + 7);
@@ -67,7 +69,7 @@ module.exports = (app, db) => {
     });
 
     app.post('/tasks', async (req, res) => {
-        let {name, assignedTo, dueDate, points, repetition, endDate} = req.body;
+        let {name, assignedTo, dueDate, points, repetition, endDate, steps} = req.body;
         if (!name) return res.status(400).json({error: 'name required'});
         try {
             dueDate = normalizeDate(dueDate);
@@ -88,6 +90,11 @@ module.exports = (app, db) => {
         await db.read();
         db.data.tasks.push(task);
         db.data.events.push(...generateEvents(task));
+        if (Array.isArray(steps)) {
+            steps.forEach(text => {
+                db.data.steps.push({ id: uuidv4(), taskId: task.id, text });
+            });
+        }
         await db.write();
         res.json(task);
     });
@@ -154,6 +161,35 @@ module.exports = (app, db) => {
         res.json(copy);
     });
 
+    // Steps endpoints
+    app.get('/steps', async (req, res) => {
+        await db.read();
+        const {taskId} = req.query;
+        let steps = db.data.steps || [];
+        if (taskId) steps = steps.filter(s => s.taskId === taskId);
+        res.json(steps);
+    });
+
+    app.post('/steps', async (req, res) => {
+        const {taskId, text} = req.body;
+        if (!taskId || !text) return res.status(400).json({error: 'taskId and text required'});
+        const step = { id: uuidv4(), taskId, text };
+        await db.read();
+        db.data.steps.push(step);
+        await db.write();
+        res.json(step);
+    });
+
+    app.delete('/steps/:id', async (req, res) => {
+        const {id} = req.params;
+        await db.read();
+        const idx = db.data.steps.findIndex(s => s.id === id);
+        if (idx === -1) return res.status(404).json({error: 'step not found'});
+        db.data.steps.splice(idx, 1);
+        await db.write();
+        res.json({success: true});
+    });
+
     // Update an event
     app.patch('/events/:id', async (req, res) => {
         const {id} = req.params;
@@ -161,7 +197,7 @@ module.exports = (app, db) => {
         const ev = db.data.events.find(e => e.id === id);
         if (!ev) return res.status(404).json({error: 'event not found'});
 
-        let {taskId, date, time} = req.body;
+        let {taskId, date, time, state, assignedTo} = req.body;
         if (taskId !== undefined) ev.taskId = taskId;
         if (date !== undefined) {
             try {
@@ -171,6 +207,20 @@ module.exports = (app, db) => {
             }
         }
         if (time !== undefined) ev.time = time;
+        if (assignedTo !== undefined) ev.assignedTo = assignedTo;
+        let completed = false;
+        if (state !== undefined) {
+            if (state === 'completed' && ev.state !== 'completed') completed = true;
+            ev.state = state;
+        }
+        if (completed) {
+            const user = db.data.users.find(u => u.id === ev.assignedTo);
+            const task = db.data.tasks.find(t => t.id === ev.taskId);
+            if (user && task) {
+                user.completedTasks = (user.completedTasks || 0) + 1;
+                user.totalScore = (user.totalScore || 0) + (task.points || 0);
+            }
+        }
         await db.write();
         res.json(ev);
     });

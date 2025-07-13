@@ -19,7 +19,7 @@ const app = express();
         completedTasks: 0
     };
     const defaultData = {
-        migrationVersion: 2,
+        migrationVersion: 3,
         users: [defaultUser],
         tasks: [
             {
@@ -33,12 +33,13 @@ const app = express();
                 endDate: new Date().toISOString().split('T')[0]
             }
         ],
-        events: []
+        events: [],
+        steps: []
     };
     const db      = new Low(adapter, defaultData);
 
     await db.read();
-    db.data ||= { tasks: [], users: [], events: [] };
+    db.data ||= { tasks: [], users: [], events: [], steps: [] };
     await migrate(db);
     if (!Array.isArray(db.data.events)) db.data.events = [];
     if (db.data.events.length === 0) {
@@ -53,7 +54,9 @@ const app = express();
                     id: uuidv4(),
                     taskId: task.id,
                     date: current.toISOString().split('T')[0],
-                    time
+                    time,
+                    assignedTo: task.assignedTo,
+                    state: 'created'
                 });
                 if (task.repetition === 'weekly') {
                     current.setDate(current.getDate() + 7);

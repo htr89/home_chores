@@ -106,7 +106,7 @@ function UsersPage({navigate}) {
                 renderItem={({item}) => (
                     <Tile
                         title={item.name}
-                        subtitle={`${item.totalScore} pts - ${item.completedTasks} tasks`}
+                        subtitle={`${item.totalScore} pts - ${item.completedTasks} events`}
                         color={USER_COLOR}
                     />
                 )}
