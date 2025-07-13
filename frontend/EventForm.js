@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { TextInput, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput } from 'react-native-paper-dates';
 import HomeChoresFormComponent from './HomeChoresFormComponent';
 import { LOCALE } from './config';
@@ -13,12 +14,25 @@ import { LOCALE } from './config';
 export default function EventForm({ event, navigateBack }) {
   const [date, setDate] = useState(event.date);
   const [time, setTime] = useState(event.time || '');
+  const [assignedTo, setAssignedTo] = useState(event.assignedTo || '');
+  const [state, setState] = useState(event.state || 'created');
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      const res = await fetch('http://localhost:3000/users');
+      const data = await res.json();
+      setUsers(data);
+      if (!assignedTo && data.length > 0) setAssignedTo(data[0].id);
+    };
+    load();
+  }, []);
 
   const saveEvent = async () => {
     await fetch(`http://localhost:3000/events/${event.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, time }),
+      body: JSON.stringify({ date, time, assignedTo, state }),
     });
   };
 
@@ -52,6 +66,27 @@ export default function EventForm({ event, navigateBack }) {
         style={styles.input}
         placeholder="HH:MM"
       />
+      <Picker
+        selectedValue={assignedTo}
+        onValueChange={setAssignedTo}
+        style={styles.input}
+      >
+        {users.map(u => (
+          <Picker.Item key={u.id} label={u.name} value={u.id} />
+        ))}
+      </Picker>
+      <Picker
+        selectedValue={state}
+        onValueChange={setState}
+        style={styles.input}
+      >
+        <Picker.Item label="Created" value="created" />
+        <Picker.Item label="Completed" value="completed" />
+      </Picker>
+      <View style={styles.readonlyWrapper}>
+        <Text style={styles.readonlyLabel}>Points:</Text>
+        <Text>{event.points}</Text>
+      </View>
     </HomeChoresFormComponent>
   );
 }
@@ -64,5 +99,13 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 4,
   },
+  readonlyWrapper: {
+    marginBottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  readonlyLabel: {
+    marginRight: 4,
+  }
 });
 

@@ -1,4 +1,4 @@
-const CURRENT_VERSION = 3;
+const CURRENT_VERSION = 4;
 
 module.exports = async function migrate(db) {
   await db.read();
@@ -51,6 +51,18 @@ module.exports = async function migrate(db) {
       }
     });
     db.data.migrationVersion = 3;
+    await db.write();
+  }
+
+  if (db.data.migrationVersion < 4) {
+    db.data.events = db.data.events || [];
+    db.data.events.forEach(ev => {
+      if (ev.points === undefined) {
+        const task = (db.data.tasks || []).find(t => t.id === ev.taskId);
+        ev.points = task?.points || 0;
+      }
+    });
+    db.data.migrationVersion = 4;
     await db.write();
   }
 };

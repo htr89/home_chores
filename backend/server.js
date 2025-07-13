@@ -56,7 +56,8 @@ const app = express();
                     date: current.toISOString().split('T')[0],
                     time,
                     assignedTo: task.assignedTo,
-                    state: 'created'
+                    state: 'created',
+                    points: task.points || 0
                 });
                 if (task.repetition === 'weekly') {
                     current.setDate(current.getDate() + 7);
