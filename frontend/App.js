@@ -190,7 +190,7 @@ export default function App() {
                 onLogout={handleLogout}
             />
             {page === 'dashboard' ? (
-                <DashboardPage user={user} />
+                <DashboardPage user={user} navigate={navigate} />
             ) : page === 'create' ? (
                 <TaskForm navigate={navigate} />
             ) : page === 'edit' ? (
