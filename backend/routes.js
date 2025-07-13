@@ -60,7 +60,10 @@ module.exports = (app, db) => {
 
     app.get('/events', async (req, res) => {
         await db.read();
-        res.json(db.data.events || []);
+        const {taskId} = req.query;
+        let events = db.data.events || [];
+        if (taskId) events = events.filter(ev => ev.taskId === taskId);
+        res.json(events);
     });
 
     app.post('/tasks', async (req, res) => {
@@ -149,6 +152,27 @@ module.exports = (app, db) => {
         db.data.events.push(...generateEvents(copy));
         await db.write();
         res.json(copy);
+    });
+
+    // Update an event
+    app.patch('/events/:id', async (req, res) => {
+        const {id} = req.params;
+        await db.read();
+        const ev = db.data.events.find(e => e.id === id);
+        if (!ev) return res.status(404).json({error: 'event not found'});
+
+        let {taskId, date, time} = req.body;
+        if (taskId !== undefined) ev.taskId = taskId;
+        if (date !== undefined) {
+            try {
+                ev.date = normalizeDate(date);
+            } catch (err) {
+                return res.status(400).json({error: err.message});
+            }
+        }
+        if (time !== undefined) ev.time = time;
+        await db.write();
+        res.json(ev);
     });
 
     app.post('/users', async (req, res) => {
