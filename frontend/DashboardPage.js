@@ -21,6 +21,7 @@ export default function DashboardPage({ user, navigate }) {
         const now = new Date().toISOString().split('T')[0];
         const filtered = data
           .filter(ev => ev.assignedTo === user.id && ev.date >= now)
+          .filter(ev => ev.state !== 'completed')
           .sort((a, b) => {
             const da = new Date(`${a.date}T${a.time || '00:00'}`);
             const db = new Date(`${b.date}T${b.time || '00:00'}`);
@@ -87,5 +88,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, marginBottom: 16 },
   subtitle: { fontSize: 18, marginTop: 12, marginBottom: 8 },
   stat: { marginBottom: 4 },
-  eventPanel: { maxHeight: 300 },
+  eventPanel: { maxHeight: 450 },
 });
