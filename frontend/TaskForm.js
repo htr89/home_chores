@@ -19,6 +19,8 @@ export default function TaskForm({ task, navigate }) {
   const [points, setPoints] = useState(task?.points ? String(task.points) : '');
   const [repetition, setRepetition] = useState(task?.repetition || 'none');
   const [endDate, setEndDate] = useState(task?.endDate || '');
+  const [steps, setSteps] = useState([]);
+  const [newStep, setNewStep] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -27,6 +29,11 @@ export default function TaskForm({ task, navigate }) {
       setUsers(data);
       if (!assignedTo && data.length > 0) {
         setAssignedTo(data[0].id);
+      }
+      if (editMode) {
+        const r2 = await fetch(`http://localhost:3000/steps?taskId=${task.id}`);
+        const sdata = await r2.json();
+        setSteps(sdata);
       }
     };
     load();
@@ -50,13 +57,48 @@ export default function TaskForm({ task, navigate }) {
         body: JSON.stringify(data)
       });
     } else {
-      await fetch('http://localhost:3000/tasks', {
+      data.steps = steps.map(s => s.text);
+      const res = await fetch('http://localhost:3000/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
+      const created = await res.json();
+      for (const s of steps) {
+        await fetch('http://localhost:3000/steps', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ taskId: created.id, text: s.text })
+        });
+      }
     }
     navigate('list');
+  };
+
+  const addStep = async () => {
+    if (!newStep.trim()) return;
+    if (editMode) {
+      await fetch('http://localhost:3000/steps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: task.id, text: newStep })
+      });
+      const r = await fetch(`http://localhost:3000/steps?taskId=${task.id}`);
+      setSteps(await r.json());
+    } else {
+      setSteps([...steps, { id: Date.now().toString(), text: newStep }]);
+    }
+    setNewStep('');
+  };
+
+  const removeStep = async (id) => {
+    if (editMode) {
+      await fetch(`http://localhost:3000/steps/${id}`, { method: 'DELETE' });
+      const r = await fetch(`http://localhost:3000/steps?taskId=${task.id}`);
+      setSteps(await r.json());
+    } else {
+      setSteps(steps.filter(s => s.id !== id));
+    }
   };
 
   return (
@@ -132,6 +174,26 @@ export default function TaskForm({ task, navigate }) {
           style={styles.input}
         />
       )}
+      <Text style={styles.subtitle}>Steps</Text>
+      {steps.map(s => (
+        <View key={s.id} style={styles.row}>
+          <Text style={[styles.input, styles.half]}>{s.text}</Text>
+          <View style={styles.buttonWrapper}>
+            <Button title="Delete" onPress={() => removeStep(s.id)} />
+          </View>
+        </View>
+      ))}
+      <View style={styles.row}>
+        <TextInput
+          placeholder="New step"
+          value={newStep}
+          onChangeText={setNewStep}
+          style={[styles.input, styles.half, styles.spacer]}
+        />
+        <View style={styles.buttonWrapper}>
+          <Button title="Add" onPress={addStep} />
+        </View>
+      </View>
       <Button title={editMode ? 'Save' : 'Add Task'} onPress={handleSubmit} />
     </View>
   );
@@ -156,4 +218,9 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     justifyContent: 'center',
   },
+  subtitle: {
+    fontSize: 18,
+    marginTop: 8,
+    marginBottom: 4
+  }
 });
