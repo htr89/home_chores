@@ -24,7 +24,8 @@ export default function DashboardPage({ user }) {
             const da = new Date(`${a.date}T${a.time || '00:00'}`);
             const db = new Date(`${b.date}T${b.time || '00:00'}`);
             return da - db;
-          });
+          })
+          .slice(0, 50); // only show the next 50 events
         setEvents(filtered);
       })
       .catch(() => {});
@@ -63,7 +64,13 @@ export default function DashboardPage({ user }) {
       <Text style={styles.stat}>Total Points: {stats.totalScore}</Text>
       <Text style={styles.stat}>Completed Tasks: {stats.completedTasks}</Text>
       <Text style={styles.subtitle}>Upcoming Events</Text>
-      <FlatList data={events} keyExtractor={e => e.id} renderItem={renderItem} />
+      <View style={styles.eventPanel}>
+        <FlatList
+          data={events}
+          keyExtractor={e => e.id}
+          renderItem={renderItem}
+        />
+      </View>
     </View>
   );
 }
@@ -73,4 +80,5 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, marginBottom: 16 },
   subtitle: { fontSize: 18, marginTop: 12, marginBottom: 8 },
   stat: { marginBottom: 4 },
+  eventPanel: { maxHeight: 300 },
 });
