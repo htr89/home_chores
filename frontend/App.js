@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native';
-import {Card, IconButton} from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
+import Tile from './Tile';
+import { TASK_COLOR, USER_COLOR } from './colors';
 import NavigationBar from './NavigationBar';
 import CalendarPage from './CalendarPage';
 import TaskForm from './TaskForm';
@@ -58,19 +60,21 @@ function TaskList({navigate}) {
 }
 
 function TaskRow({item, users, onEdit, onDuplicate, onDelete, navigate}) {
+    const actions = (
+        <>
+            <IconButton icon="pencil" onPress={() => onEdit(item)} />
+            <IconButton icon="content-copy" onPress={() => onDuplicate(item.id)} />
+            <IconButton icon="calendar" onPress={() => navigate('events', item)} />
+            <IconButton icon="delete" onPress={() => onDelete(item.id)} />
+        </>
+    );
     return (
-        <Card style={styles.card}>
-            <Card.Title
-                title={item.name}
-                subtitle={`${users[item.assignedTo] || item.assignedTo} • due ${item.dueDate} • ${item.points} pts`}
-            />
-            <Card.Actions>
-                <IconButton icon="pencil" onPress={() => onEdit(item)} />
-                <IconButton icon="content-copy" onPress={() => onDuplicate(item.id)} />
-                <IconButton icon="calendar" onPress={() => navigate('events', item)} />
-                <IconButton icon="delete" onPress={() => onDelete(item.id)} />
-            </Card.Actions>
-        </Card>
+        <Tile
+            title={item.name}
+            subtitle={`${users[item.assignedTo] || item.assignedTo} • due ${item.dueDate} • ${item.points} pts`}
+            actions={actions}
+            color={TASK_COLOR}
+        />
     );
 }
 
@@ -100,7 +104,11 @@ function UsersPage({navigate}) {
                 data={users}
                 keyExtractor={(u) => u.id}
                 renderItem={({item}) => (
-                    <Text>{item.name} - {item.totalScore} pts - {item.completedTasks} tasks</Text>
+                    <Tile
+                        title={item.name}
+                        subtitle={`${item.totalScore} pts - ${item.completedTasks} tasks`}
+                        color={USER_COLOR}
+                    />
                 )}
             />
             <TextInput
@@ -181,5 +189,4 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 4,
     },
-    card: {marginBottom: 8},
 });
