@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native';
-import {Card, IconButton} from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import {DatePickerInput} from 'react-native-paper-dates';
 import {LOCALE} from './config';
+import Tile from './Tile';
+import { EVENT_COLOR } from './colors';
 
 export default function EventsPage({task, navigate}) {
     const [events, setEvents] = useState([]);
@@ -51,11 +53,23 @@ function EventRow({item, onSave}) {
         setEditMode(false);
     };
 
+    const actions = editMode ? (
+        <>
+            <Button title="Save" onPress={save} />
+            <Button title="Cancel" onPress={() => setEditMode(false)} />
+        </>
+    ) : (
+        <IconButton icon="pencil" onPress={() => setEditMode(true)} />
+    );
+
     return (
-        <Card style={styles.card}>
-            <Card.Title title={`${item.date} ${item.time}`} />
+        <Tile
+            title={`${item.date} ${item.time}`}
+            color={EVENT_COLOR}
+            actions={actions}
+        >
             {editMode && (
-                <Card.Content>
+                <>
                     <DatePickerInput
                         locale={LOCALE}
                         label="Date"
@@ -70,26 +84,15 @@ function EventRow({item, onSave}) {
                         style={styles.input}
                         placeholder="HH:MM"
                     />
-                </Card.Content>
+                </>
             )}
-            <Card.Actions>
-                {editMode ? (
-                    <>
-                        <Button title="Save" onPress={save} />
-                        <Button title="Cancel" onPress={() => setEditMode(false)} />
-                    </>
-                ) : (
-                    <IconButton icon="pencil" onPress={() => setEditMode(true)} />
-                )}
-            </Card.Actions>
-        </Card>
+        </Tile>
     );
 }
 
 const styles = StyleSheet.create({
     container: {flex: 1, padding: 20},
     title: {fontSize: 24, marginBottom: 16},
-    card: {marginBottom: 8},
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
