@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { IconButton } from 'react-native-paper';
 import Tile from './Tile';
 import { EVENT_COLOR } from './colors';
 
@@ -7,7 +8,7 @@ import { EVENT_COLOR } from './colors';
  * Simple dashboard shown on login. It lists upcoming events for the
  * current user and displays the accumulated score and completed tasks.
  */
-export default function DashboardPage({ user }) {
+export default function DashboardPage({ user, navigate }) {
   const [events, setEvents] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ totalScore: 0, completedTasks: 0 });
@@ -55,6 +56,12 @@ export default function DashboardPage({ user }) {
       title={`${item.date} ${item.time || ''}`}
       subtitle={taskMap[item.taskId] || item.taskId}
       color={EVENT_COLOR}
+      actions={
+        <IconButton
+          icon="pencil"
+          onPress={() => navigate('event-edit', { event: item, origin: 'dashboard' })}
+        />
+      }
     />
   );
 
