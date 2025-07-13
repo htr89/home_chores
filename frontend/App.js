@@ -9,6 +9,7 @@ import TaskForm from './TaskForm';
 import EventsPage from './EventsPage';
 import EventForm from './EventForm';
 import LoginPage from './LoginPage';
+import SettingsPage from './SettingsPage';
 
 function TaskList({navigate}) {
     const [tasks, setTasks] = useState([]);
@@ -131,6 +132,7 @@ export default function App() {
     const [editingEvent, setEditingEvent] = useState(null);
     const [eventOrigin, setEventOrigin] = useState(null);
     const [user, setUser] = useState(null);
+    const [globalConfig, setGlobalConfig] = useState({ workingHoursStart: '06:00', workingHoursEnd: '22:00' });
     const [checkingLogin, setCheckingLogin] = useState(true);
 
     useEffect(() => {
@@ -146,6 +148,14 @@ export default function App() {
             .then(u => { setUser(u); setCheckingLogin(false); })
             .catch(() => setCheckingLogin(false));
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+        fetch('http://localhost:3000/config')
+            .then(res => res.json())
+            .then(setGlobalConfig)
+            .catch(() => {});
+    }, [user]);
 
     const navigate = (to, param) => {
         if (to === 'edit') setEditingTask(param);
@@ -185,7 +195,9 @@ export default function App() {
             ) : page === 'users' ? (
                 <UsersPage navigate={navigate}/>
             ) : page === 'calendar' ? (
-                <CalendarPage navigate={navigate} />
+                <CalendarPage navigate={navigate} user={user} globalConfig={globalConfig} />
+            ) : page === 'settings' ? (
+                <SettingsPage user={user} setUser={setUser} navigate={navigate} />
             ) : page === 'events' ? (
                 <EventsPage task={eventsTask} navigate={navigate}/>
             ) : page === 'event-edit' ? (

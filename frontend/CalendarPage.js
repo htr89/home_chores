@@ -6,7 +6,7 @@ import './calendarOverrides.css';
 import {Calendar as BigCalendar} from 'react-native-big-calendar';
 import {LOCALE} from './config';
 
-export default function CalendarPage({ navigate }) {
+export default function CalendarPage({ navigate, user, globalConfig }) {
     const [events, setEvents] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -83,6 +83,11 @@ export default function CalendarPage({ navigate }) {
     const {width} = useWindowDimensions();
     const isWide = width >= 768;
 
+    const start = user?.config?.workingHoursStart || globalConfig?.workingHoursStart || '06:00';
+    const end = user?.config?.workingHoursEnd || globalConfig?.workingHoursEnd || '22:00';
+    const minHour = parseInt(start.split(':')[0], 10);
+    const maxHour = parseInt(end.split(':')[0], 10);
+
     const calendarComponent = (
         <Calendar
             locale={LOCALE}
@@ -106,6 +111,8 @@ export default function CalendarPage({ navigate }) {
                                     events={dailyEvents}
                                     height={600}
                                     mode="day"
+                                    minHour={minHour}
+                                    maxHour={maxHour}
                                     date={new Date(
                                         ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
                                     )}
@@ -131,6 +138,8 @@ export default function CalendarPage({ navigate }) {
                             events={dailyEvents}
                             height={600}
                             mode="day"
+                            minHour={minHour}
+                            maxHour={maxHour}
                             date={new Date(
                                 ...selectedDate.split('.').reverse().map(Number).map((val, i) => i === 1 ? val - 1 : val)
                             )}

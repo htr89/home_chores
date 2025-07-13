@@ -39,6 +39,30 @@ module.exports = (app, db) => {
         res.json(users);
     });
 
+    app.get('/config', async (req, res) => {
+        await db.read();
+        db.data.globalConfigurations = db.data.globalConfigurations || {
+            workingHoursStart: '06:00',
+            workingHoursEnd: '22:00'
+        };
+        res.json(db.data.globalConfigurations);
+    });
+
+    app.patch('/config', async (req, res) => {
+        const { workingHoursStart, workingHoursEnd } = req.body;
+        await db.read();
+        db.data.globalConfigurations = db.data.globalConfigurations || {
+            workingHoursStart: '06:00',
+            workingHoursEnd: '22:00'
+        };
+        if (workingHoursStart !== undefined)
+            db.data.globalConfigurations.workingHoursStart = workingHoursStart;
+        if (workingHoursEnd !== undefined)
+            db.data.globalConfigurations.workingHoursEnd = workingHoursEnd;
+        await db.write();
+        res.json(db.data.globalConfigurations);
+    });
+
     function generateEvents(task) {
         const events = [];
         let current = new Date(task.dueDate);
@@ -230,12 +254,30 @@ module.exports = (app, db) => {
             name,
             password: password || 'password',
             totalScore: 0,
-            completedTasks: 0
+            completedTasks: 0,
+            config: {
+                workingHoursStart: db.data.globalConfigurations?.workingHoursStart || '06:00',
+                workingHoursEnd: db.data.globalConfigurations?.workingHoursEnd || '22:00'
+            }
         };
         await db.read();
         db.data.users.push(user);
         await db.write();
         const {password: pw, ...safeUser} = user;
+        res.json(safeUser);
+    });
+
+    app.patch('/users/:id/config', async (req, res) => {
+        const { id } = req.params;
+        const { workingHoursStart, workingHoursEnd } = req.body;
+        await db.read();
+        const user = db.data.users.find(u => u.id === id);
+        if (!user) return res.status(404).json({error: 'user not found'});
+        user.config = user.config || {};
+        if (workingHoursStart !== undefined) user.config.workingHoursStart = workingHoursStart;
+        if (workingHoursEnd !== undefined) user.config.workingHoursEnd = workingHoursEnd;
+        await db.write();
+        const { password: pw, ...safeUser } = user;
         res.json(safeUser);
     });
 
