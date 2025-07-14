@@ -85,6 +85,23 @@ const app = express();
     }
     await db.write();
 
+    // Move past events to today on startup
+    async function reschedulePastEvents() {
+        await db.read();
+        const today = new Date().toISOString().split('T')[0];
+        db.data.events.sort((a, b) => new Date(a.date) - new Date(b.date));
+        db.data.events.forEach(ev => {
+            if (new Date(ev.date) < new Date(today) && ev.state !== 'completed') {
+                ev.date = today;
+                ev.state = 'delayed';
+            }
+        });
+        await db.write();
+    }
+
+    await reschedulePastEvents();
+    setInterval(reschedulePastEvents, 60 * 60 * 1000);
+
     app.use(cors());
     app.use(express.json());
     require('./routes')(app, db);
