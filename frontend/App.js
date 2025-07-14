@@ -3,6 +3,7 @@ import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native'
 import { IconButton } from 'react-native-paper';
 import Tile from './components/Tile';
 import { TASK_COLOR, USER_COLOR } from './utils/colors';
+import { formatDateLocal } from './utils/config';
 import NavigationBar from './components/NavigationBar';
 import CalendarPage from './pages/CalendarPage';
 import TaskForm from './forms/TaskForm';
@@ -74,7 +75,7 @@ function TaskRow({item, users, onEdit, onDuplicate, onDelete, navigate}) {
     return (
         <Tile
             title={item.name}
-            subtitle={`${users[item.assignedTo] || item.assignedTo} • due ${item.dueDate} • ${item.points} pts`}
+            subtitle={`${users[item.assignedTo] || item.assignedTo} • due ${formatDateLocal(item.dueDate)} • ${item.points} pts`}
             actions={actions}
             color={TASK_COLOR}
         />

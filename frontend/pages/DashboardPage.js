@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
+import { formatDateLocal } from '../utils/config';
 
 /**
  * Simple dashboard shown on login. It lists upcoming events for the
@@ -54,7 +55,7 @@ export default function DashboardPage({ user, navigate }) {
 
   const renderItem = ({ item }) => (
     <Tile
-      title={`${item.date} ${item.time || ''}`}
+      title={`${formatDateLocal(item.date)} ${item.time || ''}`}
       subtitle={taskMap[item.taskId] || item.taskId}
       color={EVENT_COLOR}
       actions={

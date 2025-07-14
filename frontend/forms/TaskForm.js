@@ -14,12 +14,16 @@ export default function TaskForm({ task, navigate }) {
   const [name, setName] = useState(task?.name || '');
   const [assignedTo, setAssignedTo] = useState(task?.assignedTo || '');
   const [users, setUsers] = useState([]);
-  const [dueDate, setDueDate] = useState(task?.dueDate || formatDate(new Date()));
+  const [dueDate, setDueDate] = useState(
+    task?.dueDate ? formatDate(new Date(task.dueDate)) : formatDate(new Date())
+  );
   const [dueTime, setDueTime] = useState(formatTime(new Date()));
   const [timeVisible, setTimeVisible] = useState(false);
   const [points, setPoints] = useState(task?.points ? String(task.points) : '');
   const [repetition, setRepetition] = useState(task?.repetition || 'none');
-  const [endDate, setEndDate] = useState(task?.endDate || '');
+  const [endDate, setEndDate] = useState(
+    task?.endDate ? formatDate(new Date(task.endDate)) : ''
+  );
   const [steps, setSteps] = useState([]);
   const [newStep, setNewStep] = useState('');
 
