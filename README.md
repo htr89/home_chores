@@ -34,6 +34,9 @@ node backend/server.js
 ```
 
 The backend listens on `http://localhost:3000` to store tasks in a local JSON file.  You can open the Expo URL on your mobile device to interact with the app.
+When the server starts it immediately checks for events whose date lies in the past.
+Such events are moved to the current day and marked with the state `delayed`.
+This check is repeated automatically every hour while the server is running.
 
 ### Loading sample tasks
 
