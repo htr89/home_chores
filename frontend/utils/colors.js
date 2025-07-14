@@ -1,4 +1,4 @@
-export const TASK_COLOR = '#e3f2fd';
-export const EVENT_COLOR = '#e8f5e9';
-export const USER_COLOR = '#fce4ec';
+export const TASK_COLOR = '#ddd';
+export const EVENT_COLOR = '#ddd';
+export const USER_COLOR = '#ddd';
 

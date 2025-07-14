@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
     width: 600,
     alignSelf: 'center',
   },
-  title: { fontSize: 24, marginBottom: 16 },
-  buttonRow: { flexDirection: 'row', justifyContent: 'flex-end' },
+  title: { fontSize: 24, marginBottom: 16, color: '#000' },
+  buttonRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 },
   buttonWrapper: { marginLeft: 8 },
 });
 
