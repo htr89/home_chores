@@ -3,6 +3,7 @@ import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 import { IconButton } from 'react-native-paper';
 import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
+import { formatDateLocal } from '../utils/config';
 
 export default function EventsPage({task, navigate}) {
     const [events, setEvents] = useState([]);
@@ -52,7 +53,7 @@ function EventRow({item, onComplete, navigate}) {
 
     return (
         <Tile
-            title={`${item.date} ${item.time}${item.state === 'completed' ? ' (completed)' : ''}`}
+            title={`${formatDateLocal(item.date)} ${item.time}${item.state === 'completed' ? ' (completed)' : ''}`}
             color={EVENT_COLOR}
             actions={actions}
         />
