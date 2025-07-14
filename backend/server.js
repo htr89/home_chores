@@ -18,7 +18,7 @@ const app = express();
         totalScore: 0,
         completedTasks: 0,
         config: {
-            workingHoursStart: '06:00',
+            workingHoursStart: '07:00',
             workingHoursEnd: '22:00'
         }
     };
@@ -40,7 +40,7 @@ const app = express();
         events: [],
         steps: [],
         globalConfigurations: {
-            workingHoursStart: '06:00',
+            workingHoursStart: '07:00',
             workingHoursEnd: '22:00'
         }
     };
