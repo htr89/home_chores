@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 
 export default function Tile({ title, subtitle, children, actions, color }) {
   return (
-    <Card style={[styles.card, { backgroundColor: color }]}>
+    <Card style={[styles.card, { borderColor: color }]}>
       {(title || subtitle) && <Card.Title title={title} subtitle={subtitle} />}
       {children && <Card.Content>{children}</Card.Content>}
       {actions && <Card.Actions>{actions}</Card.Actions>}
@@ -13,6 +13,10 @@ export default function Tile({ title, subtitle, children, actions, color }) {
 }
 
 const styles = StyleSheet.create({
-  card: { marginBottom: 8 },
+  card: {
+    marginBottom: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+  },
 });
 

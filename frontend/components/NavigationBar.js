@@ -62,7 +62,9 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
 const styles = StyleSheet.create({
     nav: {
         padding: 10,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#fff',
+        borderRightWidth: 1,
+        borderColor: '#ddd',
     },
     toggle: {
         alignSelf: 'flex-end',
