@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
 
 /**
  * Generic wrapper component providing a consistent layout for forms in the
@@ -15,28 +15,45 @@ export default function HomeChoresFormComponent({
   submitLabel = 'Submit',
   cancelLabel = 'Cancel',
 }) {
+  const { width } = useWindowDimensions();
+  const isWide = width >= 600;
+
   return (
-    <View style={styles.container}>
-      {title && <Text style={styles.title}>{title}</Text>}
-      {children}
-      <View style={styles.buttonRow}>
-        {onCancel && (
-          <View style={styles.buttonWrapper}>
-            <Button title={cancelLabel} onPress={onCancel} />
-          </View>
-        )}
-        {onSubmit && (
-          <View style={styles.buttonWrapper}>
-            <Button title={submitLabel} onPress={onSubmit} />
-          </View>
-        )}
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={[styles.container, isWide && styles.wide]}>
+        {title && <Text style={styles.title}>{title}</Text>}
+        {children}
+        <View style={styles.buttonRow}>
+          {onCancel && (
+            <View style={styles.buttonWrapper}>
+              <Button title={cancelLabel} onPress={onCancel} />
+            </View>
+          )}
+          {onSubmit && (
+            <View style={styles.buttonWrapper}>
+              <Button title={submitLabel} onPress={onSubmit} />
+            </View>
+          )}
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  container: {
+    flex: 1,
+    width: '100%',
+  },
+  wide: {
+    width: 600,
+    alignSelf: 'center',
+  },
   title: { fontSize: 24, marginBottom: 16 },
   buttonRow: { flexDirection: 'row', justifyContent: 'flex-end' },
   buttonWrapper: { marginLeft: 8 },
