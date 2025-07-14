@@ -121,11 +121,7 @@ module.exports = (app, db) => {
         await db.read();
         db.data.tasks.push(task);
         db.data.events.push(...generateEvents(task));
-        if (Array.isArray(steps)) {
-            steps.forEach(text => {
-                db.data.steps.push({ id: uuidv4(), taskId: task.id, text });
-            });
-        }
+
         await db.write();
         res.json(task);
     });
