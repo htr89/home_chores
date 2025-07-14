@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, useWindowDimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput, TimePickerModal } from 'react-native-paper-dates';
 import { LOCALE } from '../utils/config';
@@ -7,6 +7,9 @@ import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
 
 export default function TaskForm({ task, navigate }) {
   const editMode = !!task;
+
+  const { width } = useWindowDimensions();
+  const isNarrow = width < 500;
 
   const formatDate = d => d.toLocaleDateString(LOCALE);
   const formatTime = d => d.toTimeString().slice(0, 5);
@@ -123,7 +126,7 @@ export default function TaskForm({ task, navigate }) {
         onChangeText={setName}
         style={styles.input}
       />
-      <View style={styles.row}>
+      <View style={[styles.row, isNarrow && styles.column]}>
         <Picker
           selectedValue={assignedTo}
           onValueChange={setAssignedTo}
@@ -141,7 +144,7 @@ export default function TaskForm({ task, navigate }) {
           style={[styles.input, styles.half]}
         />
       </View>
-      <View style={styles.row}>
+      <View style={[styles.row, isNarrow && styles.column]}>
         <DatePickerInput
           locale={LOCALE}
           label="Due date"
@@ -189,14 +192,14 @@ export default function TaskForm({ task, navigate }) {
       )}
       <Text style={styles.subtitle}>Steps</Text>
       {steps.map(s => (
-        <View key={s.id} style={styles.row}>
+        <View key={s.id} style={[styles.row, isNarrow && styles.column]}>
           <Text style={[styles.input, styles.half]}>{s.text}</Text>
           <View style={styles.buttonWrapper}>
             <Button title="Delete" onPress={() => removeStep(s.id)} />
           </View>
         </View>
       ))}
-      <View style={styles.row}>
+      <View style={[styles.row, isNarrow && styles.column]}>
         <TextInput
           placeholder="New step"
           value={newStep}
@@ -223,6 +226,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 8,
   },
+  column: { flexDirection: 'column' },
   half: { flex: 1 },
   spacer: { marginRight: 8 },
   buttonWrapper: {
