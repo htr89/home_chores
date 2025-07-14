@@ -263,6 +263,20 @@ module.exports = (app, db) => {
         res.json(safeUser);
     });
 
+    // Edit existing user (name or password)
+    app.patch('/users/:id', async (req, res) => {
+        const { id } = req.params;
+        const { name, password } = req.body;
+        await db.read();
+        const user = db.data.users.find(u => u.id === id);
+        if (!user) return res.status(404).json({error: 'user not found'});
+        if (name !== undefined) user.name = name;
+        if (password !== undefined && password !== '') user.password = password;
+        await db.write();
+        const { password: pw, ...safeUser } = user;
+        res.json(safeUser);
+    });
+
     app.patch('/users/:id/config', async (req, res) => {
         const { id } = req.params;
         const { workingHoursStart, workingHoursEnd } = req.body;

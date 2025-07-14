@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet, TextInput, Button} from 'react-native';
+import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
 import { IconButton } from 'react-native-paper';
 import Tile from './components/Tile';
 import { TASK_COLOR, USER_COLOR } from './utils/colors';
@@ -9,6 +9,7 @@ import CalendarPage from './pages/CalendarPage';
 import TaskForm from './forms/TaskForm';
 import EventsPage from './pages/EventsPage';
 import EventForm from './forms/EventForm';
+import UserForm from './forms/UserForm';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
 import DashboardPage from './pages/DashboardPage';
@@ -85,43 +86,31 @@ function TaskRow({item, users, onEdit, onDuplicate, onDelete, navigate}) {
 
 function UsersPage({navigate}) {
     const [users, setUsers] = useState([]);
-    const [name, setName] = useState('');
     const load = async () => {
         const res = await fetch('http://localhost:3000/users');
         const data = await res.json();
         setUsers(data);
     };
     useEffect(() => { load(); }, []);
-    const handleAdd = async () => {
-        await fetch('http://localhost:3000/users', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({name})
-        });
-        setName('');
-        load();
-    };
+
+    const renderItem = ({item}) => (
+        <Tile
+            title={item.name}
+            subtitle={`${item.totalScore} pts - ${item.completedTasks} events`}
+            color={USER_COLOR}
+            actions={<IconButton icon="pencil" onPress={() => navigate('user-edit', item)} />}
+        />
+    );
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Users</Text>
             <FlatList
                 data={users}
                 keyExtractor={(u) => u.id}
-                renderItem={({item}) => (
-                    <Tile
-                        title={item.name}
-                        subtitle={`${item.totalScore} pts - ${item.completedTasks} events`}
-                        color={USER_COLOR}
-                    />
-                )}
+                renderItem={renderItem}
             />
-            <TextInput
-                placeholder="User name"
-                value={name}
-                onChangeText={setName}
-                style={styles.input}
-            />
-            <Button title="Add User" onPress={handleAdd} />
+            <Button title="Add User" onPress={() => navigate('user-create')} />
         </View>
     );
 }
@@ -132,6 +121,7 @@ export default function App() {
     const [editingTask, setEditingTask] = useState(null);
     const [eventsTask, setEventsTask] = useState(null);
     const [editingEvent, setEditingEvent] = useState(null);
+    const [editingUser, setEditingUser] = useState(null);
     const [eventOrigin, setEventOrigin] = useState(null);
     const [user, setUser] = useState(null);
     const [globalConfig, setGlobalConfig] = useState({ workingHoursStart: '06:00', workingHoursEnd: '22:00' });
@@ -163,6 +153,8 @@ export default function App() {
         if (to === 'edit') setEditingTask(param);
         if (to === 'events') setEventsTask(param);
         if (to === 'event-edit') { setEditingEvent(param.event); setEventOrigin(param.origin); }
+        if (to === 'user-edit') setEditingUser(param);
+        if (to === 'user-create') setEditingUser(null);
         setPage(to);
     };
 
@@ -198,6 +190,10 @@ export default function App() {
                 <TaskForm task={editingTask} navigate={navigate} />
             ) : page === 'users' ? (
                 <UsersPage navigate={navigate}/>
+            ) : page === 'user-create' ? (
+                <UserForm navigateBack={() => navigate('users')} />
+            ) : page === 'user-edit' ? (
+                <UserForm user={editingUser} navigateBack={() => navigate('users')} />
             ) : page === 'calendar' ? (
                 <CalendarPage navigate={navigate} user={user} globalConfig={globalConfig} />
             ) : page === 'settings' ? (
