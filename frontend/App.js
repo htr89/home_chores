@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { IconButton, Button as PaperButton } from 'react-native-paper';
 import Tile from './components/Tile';
 import { TASK_COLOR, USER_COLOR } from './utils/colors';
 import { formatDateLocal } from './utils/config';
@@ -110,7 +110,16 @@ function UsersPage({navigate}) {
                 keyExtractor={(u) => u.id}
                 renderItem={renderItem}
             />
-            <IconButton icon="plus" onPress={() => navigate('user-create')} />
+            <PaperButton
+                mode="contained"
+                icon="plus"
+                onPress={() => navigate('user-create')}
+                buttonColor="#2196f3"
+                textColor="#fff"
+                compact
+            >
+                {''}
+            </PaperButton>
         </View>
     );
 }
