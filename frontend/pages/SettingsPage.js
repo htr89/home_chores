@@ -20,7 +20,7 @@ export default function SettingsPage({ user, setUser, navigate }) {
   };
 
   return (
-    <HomeChoresFormComponent title="Settings" onSubmit={save} onCancel={() => navigate('list')} submitLabel="Save">
+    <HomeChoresFormComponent title="Settings" onSubmit={save} onCancel={() => navigate('list')} submitIcon="content-save">
       <View style={styles.row}>
         <Button title={`Start: ${start}`} onPress={() => setShowStart(true)} />
       </View>

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
+import { IconButton } from 'react-native-paper';
 
 /**
  * Generic wrapper component providing a consistent layout for forms in the
@@ -12,8 +13,8 @@ export default function HomeChoresFormComponent({
   children,
   onSubmit,
   onCancel,
-  submitLabel = 'Submit',
-  cancelLabel = 'Cancel',
+  submitIcon = 'content-save',
+  cancelIcon = 'close',
 }) {
   const { width } = useWindowDimensions();
   const isWide = width >= 600;
@@ -26,12 +27,12 @@ export default function HomeChoresFormComponent({
         <View style={styles.buttonRow}>
           {onCancel && (
             <View style={styles.buttonWrapper}>
-              <Button title={cancelLabel} onPress={onCancel} />
+              <IconButton icon={cancelIcon} onPress={onCancel} />
             </View>
           )}
           {onSubmit && (
             <View style={styles.buttonWrapper}>
-              <Button title={submitLabel} onPress={onSubmit} />
+              <IconButton icon={submitIcon} onPress={onSubmit} />
             </View>
           )}
         </View>
