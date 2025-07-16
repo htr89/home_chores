@@ -135,6 +135,7 @@ export default function App() {
     const [user, setUser] = useState(null);
     const [globalConfig, setGlobalConfig] = useState({ workingHoursStart: '06:00', workingHoursEnd: '22:00' });
     const [checkingLogin, setCheckingLogin] = useState(true);
+    const [navigationGuard, setNavigationGuard] = useState(null);
 
     useEffect(() => {
         const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('login') : null;
@@ -159,6 +160,7 @@ export default function App() {
     }, [user]);
 
     const navigate = (to, param) => {
+        if (navigationGuard && !navigationGuard()) return;
         if (to === 'edit') setEditingTask(param);
         if (to === 'events') setEventsTask(param);
         if (to === 'event-edit') { setEditingEvent(param.event); setEventOrigin(param.origin); }
@@ -208,7 +210,7 @@ export default function App() {
             ) : page === 'settings' ? (
                 <SettingsPage user={user} setUser={setUser} navigate={navigate} />
             ) : page === 'events' ? (
-                <EventsPage task={eventsTask} navigate={navigate}/>
+                <EventsPage task={eventsTask} navigate={navigate} setNavigationGuard={setNavigationGuard}/>
             ) : page === 'event-edit' ? (
                 <EventForm event={editingEvent} navigateBack={() => navigate(eventOrigin, eventsTask)} />
             ) : (
