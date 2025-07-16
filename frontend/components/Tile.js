@@ -2,9 +2,20 @@ import React from 'react';
 import { Card } from 'react-native-paper';
 import { StyleSheet } from 'react-native';
 
-export default function Tile({ title, subtitle, children, actions, color }) {
+export default function Tile({
+  title,
+  subtitle,
+  children,
+  actions,
+  color,
+  onPress,
+  style,
+}) {
   return (
-    <Card style={[styles.card, { borderLeftColor: color }]}>
+    <Card
+      style={[styles.card, { borderLeftColor: color }, style]}
+      onPress={onPress}
+    >
       {(title || subtitle) && <Card.Title title={title} subtitle={subtitle} />}
       {children && <Card.Content>{children}</Card.Content>}
       {actions && <Card.Actions>{actions}</Card.Actions>}
