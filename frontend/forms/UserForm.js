@@ -31,7 +31,7 @@ export default function UserForm({ user, navigateBack }) {
       title={editMode ? 'Edit User' : 'Add User'}
       onSubmit={handleSubmit}
       onCancel={navigateBack}
-      submitLabel={editMode ? 'Save' : 'Add'}
+      submitIcon={editMode ? 'content-save' : 'plus'}
     >
       <TextInput
         placeholder="User name"

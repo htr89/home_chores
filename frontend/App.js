@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet, Button} from 'react-native';
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import { IconButton } from 'react-native-paper';
 import Tile from './components/Tile';
 import { TASK_COLOR, USER_COLOR } from './utils/colors';
@@ -110,7 +110,7 @@ function UsersPage({navigate}) {
                 keyExtractor={(u) => u.id}
                 renderItem={renderItem}
             />
-            <Button title="Add User" onPress={() => navigate('user-create')} />
+            <IconButton icon="plus" onPress={() => navigate('user-create')} />
         </View>
     );
 }

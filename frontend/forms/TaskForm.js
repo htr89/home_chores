@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, useWindowDimensions } from 'react-native';
+import { IconButton } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput, TimePickerModal } from 'react-native-paper-dates';
 import { LOCALE } from '../utils/config';
@@ -118,7 +119,7 @@ export default function TaskForm({ task, navigate }) {
       title={editMode ? 'Edit Task' : 'Create Task'}
       onCancel={() => navigate('list')}
       onSubmit={handleSubmit}
-      submitLabel={editMode ? 'Save' : 'Add Task'}
+      submitIcon={editMode ? 'content-save' : 'plus'}
     >
       <TextInput
         placeholder="Task name"
@@ -195,7 +196,7 @@ export default function TaskForm({ task, navigate }) {
         <View key={s.id} style={[styles.row, isNarrow && styles.column]}>
           <Text style={[styles.input, styles.half]}>{s.text}</Text>
           <View style={styles.buttonWrapper}>
-            <Button title="Delete" onPress={() => removeStep(s.id)} />
+            <IconButton icon="delete" onPress={() => removeStep(s.id)} />
           </View>
         </View>
       ))}
@@ -207,7 +208,7 @@ export default function TaskForm({ task, navigate }) {
           style={[styles.input, styles.half, styles.spacer]}
         />
         <View style={styles.buttonWrapper}>
-          <Button title="Add" onPress={addStep} />
+          <IconButton icon="plus" onPress={addStep} />
         </View>
       </View>
     </HomeChoresFormComponent>

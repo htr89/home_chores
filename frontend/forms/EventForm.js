@@ -50,7 +50,7 @@ export default function EventForm({ event, navigateBack }) {
       title="Edit Event"
       onCancel={handleCancel}
       onSubmit={handleSubmit}
-      submitLabel="Save"
+      submitIcon="content-save"
     >
       <DatePickerInput
         locale={LOCALE}
