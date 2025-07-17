@@ -17,13 +17,14 @@ const app = express();
         password: 'password',
         totalScore: 0,
         completedTasks: 0,
+        favorites: [],
         config: {
             workingHoursStart: '07:00',
             workingHoursEnd: '22:00'
         }
     };
     const defaultData = {
-        migrationVersion: 5,
+        migrationVersion: 6,
         users: [defaultUser],
         tasks: [
             {

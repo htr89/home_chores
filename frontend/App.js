@@ -194,7 +194,7 @@ export default function App() {
                 onLogout={handleLogout}
             />
             {page === 'dashboard' ? (
-                <DashboardPage user={user} navigate={navigate} />
+                <DashboardPage user={user} setUser={setUser} navigate={navigate} />
             ) : page === 'create' ? (
                 <TaskForm navigate={navigate} />
             ) : page === 'edit' ? (
@@ -210,7 +210,7 @@ export default function App() {
             ) : page === 'settings' ? (
                 <SettingsPage user={user} setUser={setUser} navigate={navigate} />
             ) : page === 'events' ? (
-                <EventsPage task={eventsTask} navigate={navigate} setNavigationGuard={setNavigationGuard}/>
+                <EventsPage task={eventsTask} navigate={navigate} setNavigationGuard={setNavigationGuard} user={user} setUser={setUser}/>
             ) : page === 'event-edit' ? (
                 <EventForm event={editingEvent} navigateBack={() => navigate(eventOrigin, eventsTask)} />
             ) : (

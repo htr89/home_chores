@@ -5,7 +5,7 @@ import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
 import { formatDateLocal } from '../utils/config';
 
-export default function EventsPage({ task, navigate, setNavigationGuard }) {
+export default function EventsPage({ task, navigate, setNavigationGuard, user, setUser }) {
     const [events, setEvents] = useState([]);
     const [progressMap, setProgressMap] = useState({});
 
@@ -62,6 +62,8 @@ export default function EventsPage({ task, navigate, setNavigationGuard }) {
             reportProgress={(id, p) =>
                 setProgressMap(m => ({ ...m, [id]: p }))
             }
+            user={user}
+            setUser={setUser}
         />
     );
 
@@ -81,7 +83,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard }) {
     );
 }
 
-function EventRow({ item, onComplete, navigate, reportProgress }) {
+function EventRow({ item, onComplete, navigate, reportProgress, user, setUser }) {
     const [steps, setSteps] = useState([]);
     const [done, setDone] = useState({});
     const [expanded, setExpanded] = useState(false);
@@ -109,8 +111,22 @@ function EventRow({ item, onComplete, navigate, reportProgress }) {
         setDone(d => ({ ...d, [id]: !d[id] }));
     };
 
+    const toggleFavorite = async () => {
+        const fav = !(user.favorites || []).includes(item.id);
+        await fetch(`http://localhost:3000/users/${user.id}/favorites`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ eventId: item.id, favorite: fav })
+        });
+        const list = fav
+            ? [ ...(user.favorites || []), item.id ]
+            : (user.favorites || []).filter(f => f !== item.id);
+        setUser({ ...user, favorites: list });
+    };
+
     const actions = (
         <>
+            <IconButton icon={(user.favorites || []).includes(item.id) ? 'star' : 'star-outline'} onPress={toggleFavorite} />
             <IconButton icon="check" onPress={() => onComplete(item.id)} disabled={item.state === 'completed'} />
             <IconButton icon="pencil" onPress={() => navigate('event-edit', { event: item, origin: 'events' })} />
         </>
