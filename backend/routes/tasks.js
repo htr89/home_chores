@@ -1,6 +1,14 @@
 const { v4: uuidv4 } = require('uuid');
 const { normalizeDate, generateEvents, applyTaskData } = require('./utils');
 
+function removeFavorites(db, ids) {
+    db.data.users = db.data.users || [];
+    db.data.users.forEach(u => {
+        if (!Array.isArray(u.favorites)) return;
+        u.favorites = u.favorites.filter(f => !ids.includes(f));
+    });
+}
+
 module.exports = (app, db) => {
     app.get('/tasks', async (req, res) => {
         await db.read();
@@ -38,7 +46,9 @@ module.exports = (app, db) => {
         } catch (err) {
             return res.status(400).json({ error: err.message });
         }
+        const removed = db.data.events.filter(e => e.taskId === id).map(e => e.id);
         db.data.events = db.data.events.filter(e => e.taskId !== id);
+        removeFavorites(db, removed);
         db.data.events.push(...generateEvents(task));
         await db.write();
         res.json(task);
@@ -50,7 +60,9 @@ module.exports = (app, db) => {
         const idx = db.data.tasks.findIndex(t => t.id === id);
         if (idx === -1) return res.status(404).json({ error: 'task not found' });
         db.data.tasks.splice(idx, 1);
+        const removed = db.data.events.filter(ev => ev.taskId === id).map(ev => ev.id);
         db.data.events = db.data.events.filter(ev => ev.taskId !== id);
+        removeFavorites(db, removed);
         await db.write();
         res.json({ success: true });
     });
