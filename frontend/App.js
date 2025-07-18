@@ -1,9 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
-import { IconButton, Button as PaperButton } from 'react-native-paper';
-import Tile from './components/Tile';
-import { TASK_COLOR, USER_COLOR } from './utils/colors';
-import { formatDateLocal } from './utils/config';
+import {View, StyleSheet} from 'react-native';
 import NavigationBar from './components/NavigationBar';
 import CalendarPage from './pages/CalendarPage';
 import TaskForm from './forms/TaskForm';
@@ -13,116 +9,8 @@ import UserForm from './forms/UserForm';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
 import DashboardPage from './pages/DashboardPage';
-
-function TaskList({navigate}) {
-    const [tasks, setTasks] = useState([]);
-    const [users, setUsers] = useState({});
-
-    const load = async () => {
-        const res = await fetch('http://localhost:3000/tasks');
-        const data = await res.json();
-        setTasks(data);
-        const resUsers = await fetch('http://localhost:3000/users');
-        const userData = await resUsers.json();
-        const map = {};
-        userData.forEach(u => { map[u.id] = u.name; });
-        setUsers(map);
-    };
-
-    useEffect(() => { load(); }, []);
-
-    const handleDuplicate = async (id) => {
-        await fetch(`http://localhost:3000/tasks/${id}/duplicate`, {method: 'POST'});
-        load();
-    };
-
-    const handleDelete = async (id) => {
-        await fetch(`http://localhost:3000/tasks/${id}`, {method: 'DELETE'});
-        load();
-    };
-
-    const renderItem = ({item}) => (
-        <TaskRow
-            item={item}
-            users={users}
-            onEdit={task => navigate('edit', task)}
-            onDuplicate={handleDuplicate}
-            onDelete={handleDelete}
-            navigate={navigate}
-        />
-    );
-
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Task List</Text>
-            <FlatList
-                data={tasks}
-                keyExtractor={(t) => t.id}
-                renderItem={renderItem}
-            />
-        </View>
-    );
-}
-
-function TaskRow({item, users, onEdit, onDuplicate, onDelete, navigate}) {
-    const actions = (
-        <>
-            <IconButton icon="pencil" onPress={() => onEdit(item)} />
-            <IconButton icon="content-copy" onPress={() => onDuplicate(item.id)} />
-            <IconButton icon="calendar" onPress={() => navigate('events', item)} />
-            <IconButton icon="delete" onPress={() => onDelete(item.id)} />
-        </>
-    );
-    return (
-        <Tile
-            title={item.name}
-            subtitle={`${users[item.assignedTo] || item.assignedTo} • due ${formatDateLocal(item.dueDate)} • ${item.points} pts`}
-            actions={actions}
-            color={TASK_COLOR}
-        />
-    );
-}
-
-
-function UsersPage({navigate}) {
-    const [users, setUsers] = useState([]);
-    const load = async () => {
-        const res = await fetch('http://localhost:3000/users');
-        const data = await res.json();
-        setUsers(data);
-    };
-    useEffect(() => { load(); }, []);
-
-    const renderItem = ({item}) => (
-        <Tile
-            title={item.name}
-            subtitle={`${item.totalScore} pts - ${item.completedTasks} events`}
-            color={USER_COLOR}
-            actions={<IconButton icon="pencil" onPress={() => navigate('user-edit', item)} />}
-        />
-    );
-
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Users</Text>
-            <FlatList
-                data={users}
-                keyExtractor={(u) => u.id}
-                renderItem={renderItem}
-            />
-            <PaperButton
-                mode="contained"
-                icon="plus"
-                onPress={() => navigate('user-create')}
-                buttonColor="#2196f3"
-                textColor="#fff"
-                compact
-            >
-                {''}
-            </PaperButton>
-        </View>
-    );
-}
+import TaskPage from './pages/TaskPage';
+import UserPage from './pages/UserPage';
 
 export default function App() {
     const [page, setPage] = useState('dashboard');
@@ -200,7 +88,7 @@ export default function App() {
             ) : page === 'edit' ? (
                 <TaskForm task={editingTask} navigate={navigate} />
             ) : page === 'users' ? (
-                <UsersPage navigate={navigate}/>
+                <UserPage navigate={navigate}/>
             ) : page === 'user-create' ? (
                 <UserForm navigateBack={() => navigate('users')} />
             ) : page === 'user-edit' ? (
@@ -214,7 +102,7 @@ export default function App() {
             ) : page === 'event-edit' ? (
                 <EventForm event={editingEvent} navigateBack={() => navigate(eventOrigin, eventsTask)} />
             ) : (
-                <TaskList navigate={navigate}/>
+                <TaskPage navigate={navigate}/>
             )}
         </View>
     );
@@ -222,13 +110,4 @@ export default function App() {
 
 const styles = StyleSheet.create({
     app: {flex: 1, flexDirection: 'row'},
-    container: {flex: 1, padding: 20},
-    title: {fontSize: 24, marginBottom: 16},
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        marginBottom: 12,
-        padding: 8,
-        borderRadius: 4,
-    },
 });
