@@ -4,7 +4,7 @@ import { IconButton } from 'react-native-paper';
 import AppButton from '../components/AppButton';
 import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
-import { formatDateLocal } from '../utils/config';
+import { formatDateLocal, formatTimeLocal } from '../utils/config';
 
 /**
  * Simple dashboard shown on login. It lists upcoming events for the
@@ -88,7 +88,7 @@ export default function DashboardPage({ user, navigate, setUser }) {
     const fav = (user.favorites || []).includes(item.id);
     return (
       <Tile
-        title={`${formatDateLocal(item.date)} ${item.time || ''}`}
+        title={`${formatDateLocal(item.date)} ${formatTimeLocal(item.time)}`}
         subtitle={taskMap[item.taskId] || item.taskId}
         color={EVENT_COLOR}
         actions={

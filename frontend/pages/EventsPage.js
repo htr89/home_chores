@@ -4,7 +4,7 @@ import { IconButton } from 'react-native-paper';
 import AppButton from '../components/AppButton';
 import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
-import { formatDateLocal } from '../utils/config';
+import { formatDateLocal, formatTimeLocal } from '../utils/config';
 
 export default function EventsPage({ task, navigate, setNavigationGuard, user, setUser }) {
     const [events, setEvents] = useState([]);
@@ -173,7 +173,7 @@ function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, 
 
     return (
         <Tile
-            title={`${formatDateLocal(item.date)} ${item.time}${item.state === 'completed' ? ' (completed)' : ''}`}
+            title={`${formatDateLocal(item.date)} ${formatTimeLocal(item.time)}${item.state === 'completed' ? ' (completed)' : ''}`}
             color={EVENT_COLOR}
             actions={actions}
             onPress={() => setExpanded(!expanded)}
