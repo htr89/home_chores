@@ -19,13 +19,13 @@ function normalizeDateTime(dateInput, timeInput) {
     if (dateInput && dateInput.includes('T') && !timeInput) {
         const date = new Date(dateInput);
         if (isNaN(date)) throw new Error(`Ungültiges Datum/Zeit: ${dateInput}`);
-        return format(date, "yyyy-MM-dd'T'HH:mm");
+        return date.toISOString();
     }
     const datePart = normalizeDate(dateInput || new Date());
-    const timePart = (timeInput || '00:00').slice(0,5);
-    const dt = new Date(`${datePart}T${timePart}`);
-    if (isNaN(dt)) throw new Error(`Ungültiges Datum/Zeit: ${dateInput} ${timeInput}`);
-    return format(dt, "yyyy-MM-dd'T'HH:mm");
+    const timePart = (timeInput || '00:00').slice(0, 5);
+    const dtLocal = new Date(`${datePart}T${timePart}`);
+    if (isNaN(dtLocal)) throw new Error(`Ungültiges Datum/Zeit: ${dateInput} ${timeInput}`);
+    return dtLocal.toISOString();
 }
 
 function generateEvents(task) {
@@ -37,7 +37,7 @@ function generateEvents(task) {
         events.push({
             id: uuidv4(),
             taskId: task.id,
-            date: `${current.toISOString().split('T')[0]}T${time}`,
+            date: `${current.toISOString().split('T')[0]}T${time}Z`,
             assignedTo: task.assignedTo,
             state: 'created',
             points: task.points || 0

@@ -12,8 +12,15 @@ import { LOCALE } from '../utils/config';
  * user returns after submitting the changes.
  */
 export default function EventForm({ event, navigateBack }) {
-  const [date, setDate] = useState(event.date.split('T')[0]);
-  const [time, setTime] = useState(event.date.split('T')[1]?.slice(0,5) || '');
+  const toLocalDate = d => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  const initial = new Date(event.date);
+  const [date, setDate] = useState(toLocalDate(initial));
+  const [time, setTime] = useState(initial.toTimeString().slice(0,5));
   const [assignedTo, setAssignedTo] = useState(event.assignedTo || '');
   const [state, setState] = useState(event.state || 'created');
   const [users, setUsers] = useState([]);
@@ -29,7 +36,7 @@ export default function EventForm({ event, navigateBack }) {
   }, []);
 
   const saveEvent = async () => {
-    const iso = `${date}T${time}`;
+    const iso = new Date(`${date}T${time}`).toISOString();
     await fetch(`http://localhost:3000/events/${event.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -57,7 +64,7 @@ export default function EventForm({ event, navigateBack }) {
         locale={LOCALE}
         label="Date"
         value={new Date(date)}
-        onChange={d => setDate(d.toISOString().split('T')[0])}
+        onChange={d => setDate(toLocalDate(d))}
         inputEnabled
         style={styles.input}
       />
