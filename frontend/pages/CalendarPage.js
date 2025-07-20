@@ -33,8 +33,9 @@ export default function CalendarPage({ navigate, user, globalConfig }) {
     const itemsByDate = useMemo(() => {
         return events.reduce((acc, ev) => {
             if (!ev.date) return acc;
-            acc[ev.date] = acc[ev.date] || [];
-            acc[ev.date].push(ev);
+            const key = ev.date.split('T')[0];
+            acc[key] = acc[key] || [];
+            acc[key].push(ev);
             return acc;
         }, {});
     }, [events]);
@@ -69,7 +70,7 @@ export default function CalendarPage({ navigate, user, globalConfig }) {
         if (!selectedDate) return [];
         const isoDate = convertToISO(selectedDate);
         return (itemsByDate[isoDate] || []).map(ev => {
-            const start = new Date(`${ev.date}T${ev.time || '00:00'}`);
+            const start = new Date(ev.date);
             const end = new Date(start.getTime() + 60 * 60 * 1000);
             return {
                 id: ev.id,

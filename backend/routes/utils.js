@@ -14,6 +14,20 @@ function normalizeDate(input) {
     return format(date, 'yyyy-MM-dd');
 }
 
+function normalizeDateTime(dateInput, timeInput) {
+    if (!dateInput && !timeInput) return null;
+    if (dateInput && dateInput.includes('T') && !timeInput) {
+        const date = new Date(dateInput);
+        if (isNaN(date)) throw new Error(`Ungültiges Datum/Zeit: ${dateInput}`);
+        return format(date, "yyyy-MM-dd'T'HH:mm");
+    }
+    const datePart = normalizeDate(dateInput || new Date());
+    const timePart = (timeInput || '00:00').slice(0,5);
+    const dt = new Date(`${datePart}T${timePart}`);
+    if (isNaN(dt)) throw new Error(`Ungültiges Datum/Zeit: ${dateInput} ${timeInput}`);
+    return format(dt, "yyyy-MM-dd'T'HH:mm");
+}
+
 function generateEvents(task) {
     const events = [];
     let current = new Date(task.dueDate);
@@ -23,8 +37,7 @@ function generateEvents(task) {
         events.push({
             id: uuidv4(),
             taskId: task.id,
-            date: current.toISOString().split('T')[0],
-            time,
+            date: `${current.toISOString().split('T')[0]}T${time}`,
             assignedTo: task.assignedTo,
             state: 'created',
             points: task.points || 0
@@ -52,4 +65,4 @@ function applyTaskData(task, data) {
     if (endDate !== undefined) task.endDate = normalizeDate(endDate);
 }
 
-module.exports = { normalizeDate, generateEvents, applyTaskData };
+module.exports = { normalizeDate, normalizeDateTime, generateEvents, applyTaskData };

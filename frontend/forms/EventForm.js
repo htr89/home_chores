@@ -12,8 +12,8 @@ import { LOCALE } from '../utils/config';
  * user returns after submitting the changes.
  */
 export default function EventForm({ event, navigateBack }) {
-  const [date, setDate] = useState(event.date);
-  const [time, setTime] = useState(event.time || '');
+  const [date, setDate] = useState(event.date.split('T')[0]);
+  const [time, setTime] = useState(event.date.split('T')[1]?.slice(0,5) || '');
   const [assignedTo, setAssignedTo] = useState(event.assignedTo || '');
   const [state, setState] = useState(event.state || 'created');
   const [users, setUsers] = useState([]);
@@ -29,10 +29,11 @@ export default function EventForm({ event, navigateBack }) {
   }, []);
 
   const saveEvent = async () => {
+    const iso = `${date}T${time}`;
     await fetch(`http://localhost:3000/events/${event.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, time, assignedTo, state }),
+      body: JSON.stringify({ date: iso, assignedTo, state }),
     });
   };
 
