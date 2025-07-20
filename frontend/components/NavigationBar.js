@@ -16,23 +16,31 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
     if (!open) {
         return (
             <View style={styles.showButton}>
-                <IconButton icon="chevron-right" onPress={() => setOpen(true)} />
+                <IconButton
+                    icon="chevron-right"
+                    size={20}
+                    style={styles.icon}
+                    onPress={() => setOpen(true)}
+                />
             </View>
         );
     }
 
     return (
-        <View style={[styles.nav, {width: 70}]}> 
+        <View style={[styles.nav, {width: 60}]}>
             <IconButton
                 icon="chevron-left"
+                size={20}
+                style={[styles.toggle, styles.icon]}
                 onPress={() => setOpen(false)}
-                style={styles.toggle}
             />
             <Drawer.Section style={{flex: 1}}>
                 {items.map(item => (
                     <Tooltip key={item.key} title={item.label}>
                         <IconButton
                             icon={item.icon}
+                            size={20}
+                            style={styles.icon}
                             onPress={() => navigate(item.key)}
                         />
                     </Tooltip>
@@ -45,7 +53,8 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
                     anchor={
                         <IconButton
                             icon="account-circle"
-                            size={24}
+                            size={20}
+                            style={styles.icon}
                             onPress={() => setMenuOpen(true)}
                         />
                     }
@@ -60,7 +69,7 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
 
 const styles = StyleSheet.create({
     nav: {
-        padding: 10,
+        padding: 5,
         backgroundColor: '#fff',
         borderRightWidth: 1,
         borderColor: '#ddd',
@@ -77,5 +86,8 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         zIndex: 1000,
+    },
+    icon: {
+        margin: 0,
     },
 });
