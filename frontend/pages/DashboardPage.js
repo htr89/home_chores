@@ -49,25 +49,13 @@ export default function DashboardPage({ user, navigate, setUser }) {
   const sorted = useMemo(() => {
     const upcoming = events
       .filter(e => e.state !== 'completed')
-      .sort((a, b) => {
-        const da = new Date(`${a.date}T${a.time || '00:00'}`);
-        const db = new Date(`${b.date}T${b.time || '00:00'}`);
-        return da - db;
-      });
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
     const completed = events
       .filter(e => e.state === 'completed')
-      .sort((a, b) => {
-        const da = new Date(`${a.date}T${a.time || '00:00'}`);
-        const db = new Date(`${b.date}T${b.time || '00:00'}`);
-        return db - da;
-      });
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
     const favorites = events
       .filter(e => (user.favorites || []).includes(e.id))
-      .sort((a, b) => {
-        const da = new Date(`${a.date}T${a.time || '00:00'}`);
-        const db = new Date(`${b.date}T${b.time || '00:00'}`);
-        return da - db;
-      });
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
     return { upcoming, completed, favorites };
   }, [events, user.favorites]);
 
@@ -88,7 +76,7 @@ export default function DashboardPage({ user, navigate, setUser }) {
     const fav = (user.favorites || []).includes(item.id);
     return (
       <Tile
-        title={`${formatDateLocal(item.date)} ${formatTimeLocal(item.time)}`}
+        title={`${formatDateLocal(item.date)} ${formatTimeLocal(item.date)}`}
         subtitle={taskMap[item.taskId] || item.taskId}
         color={EVENT_COLOR}
         actions={

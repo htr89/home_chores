@@ -1,4 +1,4 @@
-const CURRENT_VERSION = 6;
+const CURRENT_VERSION = 7;
 
 module.exports = async function migrate(db) {
   await db.read();
@@ -92,6 +92,20 @@ module.exports = async function migrate(db) {
       u.favorites = u.favorites.filter(id => valid.has(id));
     });
     db.data.migrationVersion = 6;
+    await db.write();
+  }
+
+  if (db.data.migrationVersion < 7) {
+    db.data.events = db.data.events || [];
+    db.data.events.forEach(ev => {
+      if (!ev.date) return;
+      if (!ev.date.includes('T')) {
+        const time = ev.time || '00:00';
+        ev.date = `${ev.date}T${time}`;
+      }
+      delete ev.time;
+    });
+    db.data.migrationVersion = 7;
     await db.write();
   }
 };

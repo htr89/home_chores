@@ -24,7 +24,7 @@ const app = express();
         }
     };
     const defaultData = {
-        migrationVersion: 6,
+        migrationVersion: 7,
         users: [defaultUser],
         tasks: [
             {
@@ -62,8 +62,7 @@ const app = express();
                 events.push({
                     id: uuidv4(),
                     taskId: task.id,
-                    date: current.toISOString().split('T')[0],
-                    time,
+                    date: `${current.toISOString().split('T')[0]}T${time}`,
                     assignedTo: task.assignedTo,
                     state: 'created',
                     points: task.points || 0
@@ -90,10 +89,12 @@ const app = express();
     async function reschedulePastEvents() {
         await db.read();
         const today = new Date().toISOString().split('T')[0];
+        const startToday = new Date(`${today}T00:00`);
         db.data.events.sort((a, b) => new Date(a.date) - new Date(b.date));
         db.data.events.forEach(ev => {
-            if (new Date(ev.date) < new Date(today) && ev.state !== 'completed') {
-                ev.date = today;
+            if (new Date(ev.date) < startToday && ev.state !== 'completed') {
+                const timePart = ev.date.includes('T') ? ev.date.split('T')[1] : '00:00';
+                ev.date = `${today}T${timePart}`;
                 ev.state = 'delayed';
             }
         });
