@@ -53,4 +53,14 @@ module.exports = (app, db) => {
         await db.write();
         res.json(ev);
     });
+
+    app.delete('/events/:id', async (req, res) => {
+        const { id } = req.params;
+        await db.read();
+        const idx = db.data.events.findIndex(e => e.id === id);
+        if (idx === -1) return res.status(404).json({ error: 'event not found' });
+        db.data.events.splice(idx, 1);
+        await db.write();
+        res.json({ success: true });
+    });
 };

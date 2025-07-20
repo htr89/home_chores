@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { IconButton } from 'react-native-paper';
+import AppButton from '../components/AppButton';
 import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
 import { formatDateLocal } from '../utils/config';
@@ -8,6 +9,7 @@ import { formatDateLocal } from '../utils/config';
 export default function EventsPage({ task, navigate, setNavigationGuard, user, setUser }) {
     const [events, setEvents] = useState([]);
     const [progressMap, setProgressMap] = useState({});
+    const [tab, setTab] = useState('upcoming');
 
     const load = async () => {
         const res = await fetch(`http://localhost:3000/events?taskId=${task.id}`);
@@ -59,10 +61,21 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
         load();
     };
 
+    const handleDelete = async (id) => {
+        await fetch(`http://localhost:3000/events/${id}`, { method: 'DELETE' });
+        setProgressMap(pm => {
+            const cp = { ...pm };
+            delete cp[id];
+            return cp;
+        });
+        load();
+    };
+
     const renderItem = ({ item }) => (
         <EventRow
             item={item}
             onComplete={handleComplete}
+            onDelete={handleDelete}
             navigate={navigate}
             reportProgress={(id, p) =>
                 setProgressMap(m => ({ ...m, [id]: p }))
@@ -72,11 +85,31 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
         />
     );
 
+    const displayed = events.filter(ev =>
+        tab === 'completed' ? ev.state === 'completed' : ev.state !== 'completed'
+    );
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Events for {task.name}</Text>
+            <View style={styles.tabs}>
+                <AppButton
+                    mode={tab === 'upcoming' ? 'contained' : 'outlined'}
+                    onPress={() => setTab('upcoming')}
+                    style={styles.tabButton}
+                >
+                    Not Completed
+                </AppButton>
+                <AppButton
+                    mode={tab === 'completed' ? 'contained' : 'outlined'}
+                    onPress={() => setTab('completed')}
+                    style={styles.tabButton}
+                >
+                    Completed
+                </AppButton>
+            </View>
             <FlatList
-                data={events}
+                data={displayed}
                 keyExtractor={e => e.id}
                 renderItem={renderItem}
             />
@@ -88,7 +121,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
     );
 }
 
-function EventRow({ item, onComplete, navigate, reportProgress, user, setUser }) {
+function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, setUser }) {
     const [steps, setSteps] = useState([]);
     const [done, setDone] = useState({});
     const [expanded, setExpanded] = useState(false);
@@ -134,6 +167,7 @@ function EventRow({ item, onComplete, navigate, reportProgress, user, setUser })
             <IconButton icon={(user.favorites || []).includes(item.id) ? 'star' : 'star-outline'} onPress={toggleFavorite} />
             <IconButton icon="check" onPress={() => onComplete(item.id)} disabled={item.state === 'completed'} />
             <IconButton icon="pencil" onPress={() => navigate('event-edit', { event: item, origin: 'events' })} />
+            <IconButton icon="delete" onPress={() => onDelete(item.id)} />
         </>
     );
 
@@ -163,6 +197,8 @@ function EventRow({ item, onComplete, navigate, reportProgress, user, setUser })
 const styles = StyleSheet.create({
     container: {flex: 1, padding: 20},
     title: {fontSize: 24, marginBottom: 16},
+    tabs: { flexDirection: 'row', marginVertical: 8 },
+    tabButton: { marginRight: 8 },
     stepContainer: { maxHeight: 100, overflow: 'hidden' },
     stepRow: { flexDirection: 'row', alignItems: 'center' },
     stepText: { flex: 1 }
