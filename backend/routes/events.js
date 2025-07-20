@@ -1,4 +1,5 @@
 const { normalizeDate } = require('./utils');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = (app, db) => {
     app.get('/events', async (req, res) => {
@@ -7,6 +8,28 @@ module.exports = (app, db) => {
         let events = db.data.events || [];
         if (taskId) events = events.filter(ev => ev.taskId === taskId);
         res.json(events);
+    });
+
+    app.post('/events', async (req, res) => {
+        const { taskId, date, time, assignedTo, points } = req.body;
+        if (!taskId) return res.status(400).json({ error: 'taskId required' });
+        await db.read();
+        const task = db.data.tasks.find(t => t.id === taskId);
+        if (!task) return res.status(404).json({ error: 'task not found' });
+
+        const now = new Date();
+        const ev = {
+            id: uuidv4(),
+            taskId,
+            date: normalizeDate(date || now.toISOString().split('T')[0]),
+            time: time || now.toISOString().split('T')[1].slice(0,5),
+            assignedTo: assignedTo || task.assignedTo,
+            state: 'created',
+            points: points !== undefined ? points : (task.points || 0)
+        };
+        db.data.events.push(ev);
+        await db.write();
+        res.json(ev);
     });
 
     app.patch('/events/:id', async (req, res) => {

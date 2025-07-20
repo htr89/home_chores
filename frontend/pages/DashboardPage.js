@@ -21,16 +21,7 @@ export default function DashboardPage({ user, navigate, setUser }) {
     fetch('http://localhost:3000/events')
       .then(res => res.json())
       .then(data => {
-        const now = new Date().toISOString().split('T')[0];
-        const filtered = data
-          .filter(ev => ev.assignedTo === user.id && ev.date >= now)
-          .filter(ev => ev.state !== 'completed')
-          .sort((a, b) => {
-            const da = new Date(`${a.date}T${a.time || '00:00'}`);
-            const db = new Date(`${b.date}T${b.time || '00:00'}`);
-            return da - db;
-          })
-          .slice(0, 50); // only show the next 50 events
+        const filtered = data.filter(ev => ev.assignedTo === user.id);
         setEvents(filtered);
       })
       .catch(() => {});
@@ -54,6 +45,31 @@ export default function DashboardPage({ user, navigate, setUser }) {
     });
     return map;
   }, [tasks]);
+
+  const sorted = useMemo(() => {
+    const upcoming = events
+      .filter(e => e.state !== 'completed')
+      .sort((a, b) => {
+        const da = new Date(`${a.date}T${a.time || '00:00'}`);
+        const db = new Date(`${b.date}T${b.time || '00:00'}`);
+        return da - db;
+      });
+    const completed = events
+      .filter(e => e.state === 'completed')
+      .sort((a, b) => {
+        const da = new Date(`${a.date}T${a.time || '00:00'}`);
+        const db = new Date(`${b.date}T${b.time || '00:00'}`);
+        return db - da;
+      });
+    const favorites = events
+      .filter(e => (user.favorites || []).includes(e.id))
+      .sort((a, b) => {
+        const da = new Date(`${a.date}T${a.time || '00:00'}`);
+        const db = new Date(`${b.date}T${b.time || '00:00'}`);
+        return da - db;
+      });
+    return { upcoming, completed, favorites };
+  }, [events, user.favorites]);
 
   const toggleFavorite = async (id) => {
     const fav = !(user.favorites || []).includes(id);
@@ -102,7 +118,14 @@ export default function DashboardPage({ user, navigate, setUser }) {
           onPress={() => setTab('upcoming')}
           style={styles.tabButton}
         >
-          Upcoming
+          Not Completed
+        </AppButton>
+        <AppButton
+          mode={tab === 'completed' ? 'contained' : 'outlined'}
+          onPress={() => setTab('completed')}
+          style={styles.tabButton}
+        >
+          Completed
         </AppButton>
         <AppButton
           mode={tab === 'favorites' ? 'contained' : 'outlined'}
@@ -112,10 +135,18 @@ export default function DashboardPage({ user, navigate, setUser }) {
           Favorites
         </AppButton>
       </View>
-      <Text style={styles.subtitle}>{tab === 'favorites' ? 'Favorite Events' : 'Upcoming Events'}</Text>
+      <Text style={styles.subtitle}>
+        {tab === 'favorites' ? 'Favorite Events' : tab === 'completed' ? 'Completed Events' : 'Upcoming Events'}
+      </Text>
       <View style={styles.eventPanel}>
         <FlatList
-          data={tab === 'favorites' ? events.filter(e => (user.favorites || []).includes(e.id)) : events}
+          data={
+            tab === 'favorites'
+              ? sorted.favorites
+              : tab === 'completed'
+              ? sorted.completed
+              : sorted.upcoming
+          }
           keyExtractor={e => e.id}
           renderItem={renderItem}
         />

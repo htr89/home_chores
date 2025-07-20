@@ -36,6 +36,15 @@ export default function TaskPage({ navigate }) {
     load();
   };
 
+  const handleCreateNow = async task => {
+    await fetch('http://localhost:3000/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ taskId: task.id })
+    });
+    navigate('events', task);
+  };
+
   const renderItem = ({ item }) => (
     <TaskRow
       item={item}
@@ -43,6 +52,7 @@ export default function TaskPage({ navigate }) {
       onEdit={task => navigate('edit', task)}
       onDuplicate={handleDuplicate}
       onDelete={handleDelete}
+      onCreateNow={handleCreateNow}
       navigate={navigate}
     />
   );
@@ -55,11 +65,12 @@ export default function TaskPage({ navigate }) {
   );
 }
 
-function TaskRow({ item, users, onEdit, onDuplicate, onDelete, navigate }) {
+function TaskRow({ item, users, onEdit, onDuplicate, onDelete, onCreateNow, navigate }) {
   const actions = (
     <>
       <IconButton icon="pencil" onPress={() => onEdit(item)} />
       <IconButton icon="content-copy" onPress={() => onDuplicate(item.id)} />
+      <IconButton icon="calendar-plus" onPress={() => onCreateNow(item)} />
       <IconButton icon="calendar" onPress={() => navigate('events', item)} />
       <IconButton icon="delete" onPress={() => onDelete(item.id)} />
     </>
