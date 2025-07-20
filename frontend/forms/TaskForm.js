@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, useWindowDimensions } from 'react-native';
-import { Button as PaperButton } from 'react-native-paper';
+import AppButton from '../components/AppButton';
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput, TimePickerModal } from 'react-native-paper-dates';
 import { LOCALE } from '../utils/config';
@@ -196,16 +196,15 @@ export default function TaskForm({ task, navigate }) {
         <View key={s.id} style={[styles.row, isNarrow && styles.column]}>
           <Text style={[styles.input, styles.half]}>{s.text}</Text>
           <View style={styles.buttonWrapper}>
-            <PaperButton
+            <AppButton
               mode="contained"
               icon="delete"
               onPress={() => removeStep(s.id)}
               buttonColor="#2196f3"
               textColor="#fff"
-              compact
-            >
+              >
               {''}
-            </PaperButton>
+            </AppButton>
           </View>
         </View>
       ))}
@@ -217,16 +216,15 @@ export default function TaskForm({ task, navigate }) {
           style={[styles.input, styles.half, styles.spacer]}
         />
         <View style={styles.buttonWrapper}>
-          <PaperButton
+          <AppButton
             mode="contained"
             icon="plus"
             onPress={addStep}
             buttonColor="#2196f3"
             textColor="#fff"
-            compact
           >
             {''}
-          </PaperButton>
+          </AppButton>
         </View>
       </View>
     </HomeChoresFormComponent>

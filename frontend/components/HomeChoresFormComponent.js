@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
-import { Button as PaperButton } from 'react-native-paper';
+import AppButton from './AppButton';
 
 /**
  * Generic wrapper component providing a consistent layout for forms in the
@@ -27,30 +27,28 @@ export default function HomeChoresFormComponent({
         <View style={styles.buttonRow}>
           {onCancel && (
             <View style={styles.buttonWrapper}>
-              <PaperButton
+              <AppButton
                 mode="contained"
                 icon={cancelIcon}
                 onPress={onCancel}
                 buttonColor="#2196f3"
                 textColor="#fff"
-                compact
               >
                 {''}
-              </PaperButton>
+              </AppButton>
             </View>
           )}
           {onSubmit && (
             <View style={styles.buttonWrapper}>
-              <PaperButton
+              <AppButton
                 mode="contained"
                 icon={submitIcon}
                 onPress={onSubmit}
                 buttonColor="#2196f3"
                 textColor="#fff"
-                compact
               >
                 {''}
-              </PaperButton>
+              </AppButton>
             </View>
           )}
         </View>

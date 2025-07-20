@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { IconButton, Button as PaperButton } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
+import AppButton from '../components/AppButton';
 import Tile from '../components/Tile';
 import { USER_COLOR } from '../utils/colors';
 
@@ -30,16 +31,15 @@ export default function UserPage({ navigate }) {
     <View style={styles.container}>
       <Text style={styles.title}>Users</Text>
       <FlatList data={users} keyExtractor={u => u.id} renderItem={renderItem} />
-      <PaperButton
+      <AppButton
         mode="contained"
         icon="plus"
         onPress={() => navigate('user-create')}
         buttonColor="#2196f3"
         textColor="#fff"
-        compact
       >
         {''}
-      </PaperButton>
+      </AppButton>
     </View>
   );
 }
