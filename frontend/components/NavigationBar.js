@@ -13,30 +13,29 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
 
     const [menuOpen, setMenuOpen] = React.useState(false);
 
+    if (!open) {
+        return (
+            <View style={styles.showButton}>
+                <IconButton icon="chevron-right" onPress={() => setOpen(true)} />
+            </View>
+        );
+    }
+
     return (
-        <View style={[styles.nav, {width: open ? 200 : 80}]}>
+        <View style={[styles.nav, {width: 70}]}> 
             <IconButton
-                icon={open ? 'chevron-left' : 'chevron-right'}
-                onPress={() => setOpen(!open)}
+                icon="chevron-left"
+                onPress={() => setOpen(false)}
                 style={styles.toggle}
             />
             <Drawer.Section style={{flex: 1}}>
                 {items.map(item => (
-                    open ? (
-                        <Drawer.Item
-                            key={item.key}
-                            label={item.label}
+                    <Tooltip key={item.key} title={item.label}>
+                        <IconButton
                             icon={item.icon}
                             onPress={() => navigate(item.key)}
                         />
-                    ) : (
-                        <Tooltip key={item.key} title={item.label}>
-                            <IconButton
-                                icon={item.icon}
-                                onPress={() => navigate(item.key)}
-                            />
-                        </Tooltip>
-                    )
+                    </Tooltip>
                 ))}
             </Drawer.Section>
             <View style={styles.userMenu}>
@@ -46,7 +45,7 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
                     anchor={
                         <IconButton
                             icon="account-circle"
-                            size={open ? 32 : 24}
+                            size={24}
                             onPress={() => setMenuOpen(true)}
                         />
                     }
@@ -72,5 +71,11 @@ const styles = StyleSheet.create({
     userMenu: {
         alignItems: 'center',
         marginBottom: 8,
+    },
+    showButton: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 1000,
     },
 });
