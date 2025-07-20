@@ -9,3 +9,24 @@ export function formatDateLocal(isoDate) {
   return new Date(isoDate).toLocaleDateString(LOCALE);
 }
 
+/**
+ * Convert a time string into a locale formatted string.
+ * The input may either be a bare "HH:MM" value or an ISO timestamp.
+ */
+export function formatTimeLocal(timeStr) {
+  if (!timeStr) return '';
+  let date;
+  if (/^\d{4}-\d{2}-\d{2}T/.test(timeStr)) {
+    // Full ISO timestamp
+    date = new Date(timeStr);
+  } else {
+    const [h, m] = timeStr.split(':');
+    date = new Date();
+    date.setHours(parseInt(h, 10));
+    date.setMinutes(parseInt(m, 10));
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+  }
+  return date.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' });
+}
+
