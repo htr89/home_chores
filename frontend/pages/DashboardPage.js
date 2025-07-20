@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { IconButton, Button as PaperButton } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
+import AppButton from '../components/AppButton';
 import Tile from '../components/Tile';
 import { EVENT_COLOR } from '../utils/colors';
 import { formatDateLocal } from '../utils/config';
@@ -96,22 +97,20 @@ export default function DashboardPage({ user, navigate, setUser }) {
       <Text style={styles.stat}>Total Points: {stats.totalScore}</Text>
       <Text style={styles.stat}>Completed Tasks: {stats.completedTasks}</Text>
       <View style={styles.tabs}>
-        <PaperButton
+        <AppButton
           mode={tab === 'upcoming' ? 'contained' : 'outlined'}
           onPress={() => setTab('upcoming')}
-          compact
           style={styles.tabButton}
         >
           Upcoming
-        </PaperButton>
-        <PaperButton
+        </AppButton>
+        <AppButton
           mode={tab === 'favorites' ? 'contained' : 'outlined'}
           onPress={() => setTab('favorites')}
-          compact
           style={styles.tabButton}
         >
           Favorites
-        </PaperButton>
+        </AppButton>
       </View>
       <Text style={styles.subtitle}>{tab === 'favorites' ? 'Favorite Events' : 'Upcoming Events'}</Text>
       <View style={styles.eventPanel}>
