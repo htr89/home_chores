@@ -17,8 +17,10 @@ export function formatTimeLocal(timeStr) {
   if (!timeStr) return '';
   let date;
   if (/^\d{4}-\d{2}-\d{2}T/.test(timeStr)) {
-    // Full ISO timestamp
-    date = new Date(timeStr);
+    // Full ISO timestamp. Treat lack of explicit timezone as UTC so
+    // toLocaleTimeString() converts to the local zone correctly.
+    const iso = /(Z|[+-]\d{2}:\d{2})$/.test(timeStr) ? timeStr : `${timeStr}Z`;
+    date = new Date(iso);
   } else {
     const [h, m] = timeStr.split(':');
     date = new Date();
