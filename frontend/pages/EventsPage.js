@@ -12,6 +12,11 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
     const load = async () => {
         const res = await fetch(`http://localhost:3000/events?taskId=${task.id}`);
         const data = await res.json();
+        data.sort((a, b) => {
+            const da = new Date(`${a.date}T${a.time || '00:00'}`);
+            const db = new Date(`${b.date}T${b.time || '00:00'}`);
+            return da - db;
+        });
         setEvents(data);
     };
 
