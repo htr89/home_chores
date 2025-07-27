@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Drawer, IconButton, Tooltip, Menu } from 'react-native-paper';
+import {View, StyleSheet} from 'react-native';
+import {Drawer, IconButton, Tooltip, Menu} from 'react-native-paper';
 
-export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
+export default function NavigationBar({navigate, open, setOpen, onLogout}) {
     const items = [
         {key: 'dashboard', label: 'Dashboard', icon: 'view-dashboard'},
         {key: 'create', label: 'Add Task', icon: 'plus'},
@@ -11,7 +11,7 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
         {key: 'calendar', label: 'Calendar', icon: 'calendar'},
     ];
 
-    const [menuOpen, setMenuOpen] = React.useState(false);
+    const [menuOpen, setMenuOpen] = React.useState(true);
 
     if (!open) {
         return (
@@ -47,21 +47,21 @@ export default function NavigationBar({ navigate, open, setOpen, onLogout }) {
                 ))}
             </Drawer.Section>
             <View style={styles.userMenu}>
-                <Menu
-                    visible={menuOpen}
-                    onDismiss={() => setMenuOpen(false)}
-                    anchor={
-                        <IconButton
-                            icon="account-circle"
-                            size={20}
-                            style={styles.icon}
-                            onPress={() => setMenuOpen(true)}
-                        />
-                    }
-                >
-                    <Menu.Item leadingIcon="cog" onPress={() => { setMenuOpen(false); navigate('settings'); }} title="Settings" />
-                    <Menu.Item leadingIcon="logout" onPress={onLogout} title="Log Out" />
-                </Menu>
+                <IconButton
+                    icon="cog"
+                    size={20}
+                    style={styles.icon}
+                    onPress={() => {
+                        setMenuOpen(false);
+                        navigate('settings');
+                    }} title="Settings"
+                />
+                <IconButton
+                    icon="logout"
+                    size={20}
+                    style={styles.icon}
+                    onPress={onLogout} title="Log Out"
+                />
             </View>
         </View>
     );
