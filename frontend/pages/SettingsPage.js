@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Button, StyleSheet } from 'react-native';
+import { View, Button, StyleSheet, TextInput } from 'react-native';
 import { TimePickerModal } from 'react-native-paper-dates';
 import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
 
 export default function SettingsPage({ user, setUser, navigate }) {
   const [start, setStart] = useState(user.config?.workingHoursStart || '06:00');
   const [end, setEnd] = useState(user.config?.workingHoursEnd || '22:00');
+  const [calendarId, setCalendarId] = useState(user.config?.googleCalendarId || '');
+  const [apiKey, setApiKey] = useState(user.config?.googleApiKey || '');
   const [showStart, setShowStart] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
 
@@ -13,9 +15,23 @@ export default function SettingsPage({ user, setUser, navigate }) {
     await fetch(`http://localhost:3000/users/${user.id}/config`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workingHoursStart: start, workingHoursEnd: end })
+      body: JSON.stringify({
+        workingHoursStart: start,
+        workingHoursEnd: end,
+        googleCalendarId: calendarId,
+        googleApiKey: apiKey,
+      })
     });
-    setUser({ ...user, config: { ...user.config, workingHoursStart: start, workingHoursEnd: end } });
+    setUser({
+      ...user,
+      config: {
+        ...user.config,
+        workingHoursStart: start,
+        workingHoursEnd: end,
+        googleCalendarId: calendarId,
+        googleApiKey: apiKey,
+      },
+    });
     navigate('list');
   };
 
@@ -51,10 +67,29 @@ export default function SettingsPage({ user, setUser, navigate }) {
         hours={parseInt(end.split(':')[0], 10)}
         minutes={parseInt(end.split(':')[1], 10)}
       />
+      <TextInput
+        placeholder="Google Calendar ID"
+        value={calendarId}
+        onChangeText={setCalendarId}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Google API Key"
+        value={apiKey}
+        onChangeText={setApiKey}
+        style={styles.input}
+      />
     </HomeChoresFormComponent>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { marginBottom: 8 }
+  row: { marginBottom: 8 },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    marginBottom: 8,
+    padding: 8,
+    borderRadius: 4,
+  },
 });

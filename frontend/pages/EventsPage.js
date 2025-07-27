@@ -2,9 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import AppButton from '../components/AppButton';
-import Tile from '../components/Tile';
-import { EVENT_COLOR } from '../utils/colors';
-import { formatDateLocal, formatTimeLocal } from '../utils/config';
+import EventTile from '../components/EventTile';
 
 export default function EventsPage({ task, navigate, setNavigationGuard, user, setUser }) {
     const [events, setEvents] = useState([]);
@@ -78,6 +76,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
             }
             user={user}
             setUser={setUser}
+            task={task}
         />
     );
 
@@ -117,7 +116,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
     );
 }
 
-function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, setUser }) {
+function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, setUser, task }) {
     const [steps, setSteps] = useState([]);
     const [done, setDone] = useState({});
     const [expanded, setExpanded] = useState(false);
@@ -145,33 +144,15 @@ function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, 
         setDone(d => ({ ...d, [id]: !d[id] }));
     };
 
-    const toggleFavorite = async () => {
-        const fav = !(user.favorites || []).includes(item.id);
-        await fetch(`http://localhost:3000/users/${user.id}/favorites`, {
-            method: 'PATCH',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ eventId: item.id, favorite: fav })
-        });
-        const list = fav
-            ? [ ...(user.favorites || []), item.id ]
-            : (user.favorites || []).filter(f => f !== item.id);
-        setUser({ ...user, favorites: list });
-    };
-
-    const actions = (
-        <>
-            <IconButton icon={(user.favorites || []).includes(item.id) ? 'star' : 'star-outline'} onPress={toggleFavorite} />
-            <IconButton icon="check" onPress={() => onComplete(item.id)} disabled={item.state === 'completed'} />
-            <IconButton icon="pencil" onPress={() => navigate('event-edit', { event: item, origin: 'events' })} />
-            <IconButton icon="delete" onPress={() => onDelete(item.id)} />
-        </>
-    );
-
     return (
-        <Tile
-            title={`${formatDateLocal(item.date)} ${formatTimeLocal(item.date)}${item.state === 'completed' ? ' (completed)' : ''}`}
-            color={EVENT_COLOR}
-            actions={actions}
+        <EventTile
+            event={item}
+            taskName={task.name}
+            user={user}
+            setUser={setUser}
+            onComplete={onComplete}
+            onDelete={onDelete}
+            navigate={navigate}
             onPress={() => setExpanded(!expanded)}
         >
             <View style={expanded ? null : styles.stepContainer}>
@@ -186,7 +167,7 @@ function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, 
                     </View>
                 ))}
             </View>
-        </Tile>
+        </EventTile>
     );
 }
 
