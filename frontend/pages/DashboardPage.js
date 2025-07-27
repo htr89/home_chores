@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { IconButton } from 'react-native-paper';
 import AppButton from '../components/AppButton';
-import Tile from '../components/Tile';
-import { EVENT_COLOR } from '../utils/colors';
-import { formatDateLocal, formatTimeLocal } from '../utils/config';
+import EventTile from '../components/EventTile';
+
 
 /**
  * Simple dashboard shown on login. It lists upcoming events for the
@@ -59,41 +57,16 @@ export default function DashboardPage({ user, navigate, setUser }) {
     return { upcoming, completed, favorites };
   }, [events, user.favorites]);
 
-  const toggleFavorite = async (id) => {
-    const fav = !(user.favorites || []).includes(id);
-    await fetch(`http://localhost:3000/users/${user.id}/favorites`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ eventId: id, favorite: fav })
-    });
-    const list = fav
-      ? [ ...(user.favorites || []), id ]
-      : (user.favorites || []).filter(f => f !== id);
-    setUser({ ...user, favorites: list });
-  };
 
-  const renderItem = ({ item }) => {
-    const fav = (user.favorites || []).includes(item.id);
-    return (
-      <Tile
-        title={`${formatDateLocal(item.date)} ${formatTimeLocal(item.date)}`}
-        subtitle={taskMap[item.taskId] || item.taskId}
-        color={EVENT_COLOR}
-        actions={
-          <>
-            <IconButton
-              icon={fav ? 'star' : 'star-outline'}
-              onPress={() => toggleFavorite(item.id)}
-            />
-            <IconButton
-              icon="pencil"
-              onPress={() => navigate('event-edit', { event: item, origin: 'dashboard' })}
-            />
-          </>
-        }
-      />
-    );
-  };
+  const renderItem = ({ item }) => (
+    <EventTile
+      event={item}
+      taskName={taskMap[item.taskId] || item.taskId}
+      user={user}
+      setUser={setUser}
+      navigate={navigate}
+    />
+  );
 
   return (
     <View style={styles.container}>

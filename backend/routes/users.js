@@ -50,13 +50,15 @@ module.exports = (app, db) => {
 
     app.patch('/users/:id/config', async (req, res) => {
         const { id } = req.params;
-        const { workingHoursStart, workingHoursEnd } = req.body;
+        const { workingHoursStart, workingHoursEnd, googleCalendarId, googleApiKey } = req.body;
         await db.read();
         const user = db.data.users.find(u => u.id === id);
         if (!user) return res.status(404).json({ error: 'user not found' });
         user.config = user.config || {};
         if (workingHoursStart !== undefined) user.config.workingHoursStart = workingHoursStart;
         if (workingHoursEnd !== undefined) user.config.workingHoursEnd = workingHoursEnd;
+        if (googleCalendarId !== undefined) user.config.googleCalendarId = googleCalendarId;
+        if (googleApiKey !== undefined) user.config.googleApiKey = googleApiKey;
         await db.write();
         const { password: pw, ...safeUser } = user;
         res.json(safeUser);

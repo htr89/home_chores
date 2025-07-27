@@ -20,11 +20,13 @@ const app = express();
         favorites: [],
         config: {
             workingHoursStart: '07:00',
-            workingHoursEnd: '22:00'
+            workingHoursEnd: '22:00',
+            googleCalendarId: '',
+            googleApiKey: ''
         }
     };
     const defaultData = {
-        migrationVersion: 7,
+        migrationVersion: 8,
         users: [defaultUser],
         tasks: [
             {

@@ -1,4 +1,4 @@
-const CURRENT_VERSION = 7;
+const CURRENT_VERSION = 8;
 
 module.exports = async function migrate(db) {
   await db.read();
@@ -106,6 +106,17 @@ module.exports = async function migrate(db) {
       delete ev.time;
     });
     db.data.migrationVersion = 7;
+    await db.write();
+  }
+
+  if (db.data.migrationVersion < 8) {
+    db.data.users = db.data.users || [];
+    db.data.users.forEach(u => {
+      u.config = u.config || {};
+      if (u.config.googleCalendarId === undefined) u.config.googleCalendarId = '';
+      if (u.config.googleApiKey === undefined) u.config.googleApiKey = '';
+    });
+    db.data.migrationVersion = 8;
     await db.write();
   }
 };
