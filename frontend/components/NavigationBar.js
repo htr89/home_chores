@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Drawer, IconButton, Tooltip, Menu} from 'react-native-paper';
+import {Drawer, IconButton, Tooltip, Surface, useTheme} from 'react-native-paper';
 
 export default function NavigationBar({navigate, open, setOpen, onLogout}) {
     const items = [
@@ -11,7 +11,7 @@ export default function NavigationBar({navigate, open, setOpen, onLogout}) {
         {key: 'calendar', label: 'Calendar', icon: 'calendar'},
     ];
 
-    const [menuOpen, setMenuOpen] = React.useState(true);
+    const theme = useTheme();
 
     if (!open) {
         return (
@@ -27,7 +27,7 @@ export default function NavigationBar({navigate, open, setOpen, onLogout}) {
     }
 
     return (
-        <View style={[styles.nav, {width: 60}]}>
+        <Surface style={[styles.nav, {width: 60, borderColor: theme.colors.outlineVariant}]} elevation={2}>
             <IconButton
                 icon="chevron-left"
                 size={20}
@@ -51,10 +51,7 @@ export default function NavigationBar({navigate, open, setOpen, onLogout}) {
                     icon="cog"
                     size={20}
                     style={styles.icon}
-                    onPress={() => {
-                        setMenuOpen(false);
-                        navigate('settings');
-                    }} title="Settings"
+                    onPress={() => navigate('settings')} title="Settings"
                 />
                 <IconButton
                     icon="logout"
@@ -63,16 +60,14 @@ export default function NavigationBar({navigate, open, setOpen, onLogout}) {
                     onPress={onLogout} title="Log Out"
                 />
             </View>
-        </View>
+        </Surface>
     );
 }
 
 const styles = StyleSheet.create({
     nav: {
         padding: 5,
-        backgroundColor: '#fff',
         borderRightWidth: 1,
-        borderColor: '#ddd',
     },
     toggle: {
         alignSelf: 'flex-end',
