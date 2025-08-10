@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Switch, useWindowDimensions, ScrollView } from 'react-native';
+import { View, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
+import { Text, TextInput, Button, Switch, Surface } from 'react-native-paper';
 
 export default function LoginPage({ onLogin }) {
   const [name, setName] = useState('');
@@ -29,27 +30,29 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
-    <View style={[styles.container, isWide && styles.containerWide]}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        placeholder="Username"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      <View style={styles.rememberRow}>
-        <Switch value={remember} onValueChange={setRemember} />
-        <Text style={styles.rememberLabel}>Remember me</Text>
-      </View>
-      <Button title="Login" onPress={handleLogin} />
-    </View>
+      <Surface style={[styles.container, isWide && styles.containerWide]} elevation={2}>
+        <Text variant="headlineMedium" style={styles.title}>Login</Text>
+        <TextInput
+          label="Username"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+          mode="outlined"
+        />
+        <TextInput
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+          mode="outlined"
+        />
+        <View style={styles.rememberRow}>
+          <Switch value={remember} onValueChange={setRemember} />
+          <Text style={styles.rememberLabel}>Remember me</Text>
+        </View>
+        <Button mode="contained" onPress={handleLogin}>Login</Button>
+      </Surface>
     </ScrollView>
   );
 }
@@ -60,16 +63,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  container: { flex: 1, width: '100%' },
+  container: { flex: 1, width: '100%', padding: 16, borderRadius: 8 },
   containerWide: { width: 400, alignSelf: 'center' },
-  title: { fontSize: 24, marginBottom: 16, textAlign: 'center' },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 8,
-    padding: 8,
-    borderRadius: 4,
-  },
+  title: { textAlign: 'center', marginBottom: 16 },
+  input: { marginBottom: 8 },
   rememberRow: {
     flexDirection: 'row',
     alignItems: 'center',
