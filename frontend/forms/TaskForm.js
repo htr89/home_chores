@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput, TimePickerModal } from 'react-native-paper-dates';
 import { LOCALE } from '../utils/config';
 import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
+import API_URL from '../api';
 
 export default function TaskForm({ task, navigate }) {
   const editMode = !!task;
@@ -33,14 +34,14 @@ export default function TaskForm({ task, navigate }) {
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch('http://localhost:3000/users');
+      const res = await fetch(`${API_URL}/users`);
       const data = await res.json();
       setUsers(data);
       if (!assignedTo && data.length > 0) {
         setAssignedTo(data[0].id);
       }
       if (editMode) {
-        const r2 = await fetch(`http://localhost:3000/steps?taskId=${task.id}`);
+        const r2 = await fetch(`${API_URL}/steps?taskId=${task.id}`);
         const sdata = await r2.json();
         setSteps(sdata);
       }
@@ -60,21 +61,21 @@ export default function TaskForm({ task, navigate }) {
   const saveTask = async () => {
     const data = { name, assignedTo, dueDate, dueTime, points, repetition, endDate };
     if (editMode) {
-      await fetch(`http://localhost:3000/tasks/${task.id}`, {
+      await fetch(`${API_URL}/tasks/${task.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
     } else {
       data.steps = steps.map(s => s.text);
-      const res = await fetch('http://localhost:3000/tasks', {
+      const res = await fetch(`${API_URL}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
       const created = await res.json();
       for (const s of steps) {
-        await fetch('http://localhost:3000/steps', {
+        await fetch(`${API_URL}/steps`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ taskId: created.id, text: s.text })
@@ -91,12 +92,12 @@ export default function TaskForm({ task, navigate }) {
   const addStep = async () => {
     if (!newStep.trim()) return;
     if (editMode) {
-      await fetch('http://localhost:3000/steps', {
+      await fetch(`${API_URL}/steps`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ taskId: task.id, text: newStep })
       });
-      const r = await fetch(`http://localhost:3000/steps?taskId=${task.id}`);
+      const r = await fetch(`${API_URL}/steps?taskId=${task.id}`);
       setSteps(await r.json());
     } else {
       setSteps([...steps, { id: Date.now().toString(), text: newStep }]);
@@ -106,8 +107,8 @@ export default function TaskForm({ task, navigate }) {
 
   const removeStep = async (id) => {
     if (editMode) {
-      await fetch(`http://localhost:3000/steps/${id}`, { method: 'DELETE' });
-      const r = await fetch(`http://localhost:3000/steps?taskId=${task.id}`);
+      await fetch(`${API_URL}/steps/${id}`, { method: 'DELETE' });
+      const r = await fetch(`${API_URL}/steps?taskId=${task.id}`);
       setSteps(await r.json());
     } else {
       setSteps(steps.filter(s => s.id !== id));

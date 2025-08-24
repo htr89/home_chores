@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextInput, StyleSheet } from 'react-native';
 import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
+import API_URL from '../api';
 
 export default function UserForm({ user, navigateBack }) {
   const editMode = !!user;
@@ -11,13 +12,13 @@ export default function UserForm({ user, navigateBack }) {
     const body = { name };
     if (password) body.password = password;
     if (editMode) {
-      await fetch(`http://localhost:3000/users/${user.id}`, {
+      await fetch(`${API_URL}/users/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
     } else {
-      await fetch('http://localhost:3000/users', {
+      await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import AppButton from '../components/AppButton';
 import EventTile from '../components/EventTile';
+import API_URL from '../api';
 
 
 /**
@@ -16,18 +17,18 @@ export default function DashboardPage({ user, navigate, setUser }) {
 
   useEffect(() => {
     if (!user) return;
-    fetch('http://localhost:3000/events')
+    fetch(`${API_URL}/events`)
       .then(res => res.json())
       .then(data => {
         const filtered = data.filter(ev => ev.assignedTo === user.id);
         setEvents(filtered);
       })
       .catch(() => {});
-    fetch('http://localhost:3000/tasks')
+    fetch(`${API_URL}/tasks`)
       .then(res => res.json())
       .then(setTasks)
       .catch(() => {});
-    fetch('http://localhost:3000/users')
+    fetch(`${API_URL}/users`)
       .then(res => res.json())
       .then(users => {
         const me = users.find(u => u.id === user.id);

@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage';
 import DashboardPage from './pages/DashboardPage';
 import TaskPage from './pages/TaskPage';
 import UserPage from './pages/UserPage';
+import API_URL from './api';
 
 const theme = {
     ...MD3LightTheme,
@@ -40,7 +41,7 @@ export default function App() {
         const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('login') : null;
         if (!saved) { setCheckingLogin(false); return; }
         const {name, password} = JSON.parse(saved);
-        fetch('http://localhost:3000/login', {
+        fetch(`${API_URL}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({name, password})
@@ -52,7 +53,7 @@ export default function App() {
 
     useEffect(() => {
         if (!user) return;
-        fetch('http://localhost:3000/config')
+        fetch(`${API_URL}/config`)
             .then(res => res.json())
             .then(setGlobalConfig)
             .catch(() => {});

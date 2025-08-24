@@ -4,12 +4,13 @@ import { IconButton } from 'react-native-paper';
 import AppButton from '../components/AppButton';
 import Tile from '../components/Tile';
 import { USER_COLOR } from '../utils/colors';
+import API_URL from '../api';
 
 export default function UserPage({ navigate }) {
   const [users, setUsers] = useState([]);
 
   const load = async () => {
-    const res = await fetch('http://localhost:3000/users');
+    const res = await fetch(`${API_URL}/users`);
     const data = await res.json();
     setUsers(data);
   };
