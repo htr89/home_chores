@@ -5,6 +5,7 @@ import 'react-calendar/dist/Calendar.css';
 import '../styles/calendarOverrides.css';
 import {Calendar as BigCalendar} from 'react-native-big-calendar';
 import {LOCALE} from '../utils/config';
+import API_URL from '../api';
 
 export default function CalendarPage({ navigate, user, globalConfig }) {
     const [events, setEvents] = useState([]);
@@ -12,11 +13,11 @@ export default function CalendarPage({ navigate, user, globalConfig }) {
     const [selectedDate, setSelectedDate] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost:3000/events')
+        fetch(`${API_URL}/events`)
             .then(res => res.json())
             .then(setEvents)
             .catch(console.error);
-        fetch('http://localhost:3000/tasks')
+        fetch(`${API_URL}/tasks`)
             .then(res => res.json())
             .then(setTasks)
             .catch(console.error);

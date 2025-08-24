@@ -4,16 +4,17 @@ import { IconButton } from 'react-native-paper';
 import Tile from '../components/Tile';
 import { TASK_COLOR } from '../utils/colors';
 import { formatDateLocal } from '../utils/config';
+import API_URL from '../api';
 
 export default function TaskPage({ navigate }) {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState({});
 
   const load = async () => {
-    const res = await fetch('http://localhost:3000/tasks');
+    const res = await fetch(`${API_URL}/tasks`);
     const data = await res.json();
     setTasks(data);
-    const resUsers = await fetch('http://localhost:3000/users');
+    const resUsers = await fetch(`${API_URL}/users`);
     const userData = await resUsers.json();
     const map = {};
     userData.forEach(u => {
@@ -27,17 +28,17 @@ export default function TaskPage({ navigate }) {
   }, []);
 
   const handleDuplicate = async id => {
-    await fetch(`http://localhost:3000/tasks/${id}/duplicate`, { method: 'POST' });
+    await fetch(`${API_URL}/tasks/${id}/duplicate`, { method: 'POST' });
     load();
   };
 
   const handleDelete = async id => {
-    await fetch(`http://localhost:3000/tasks/${id}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
     load();
   };
 
   const handleCreateNow = async task => {
-    await fetch('http://localhost:3000/events', {
+    await fetch(`${API_URL}/events`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ taskId: task.id })

@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import AppButton from '../components/AppButton';
 import EventTile from '../components/EventTile';
+import API_URL from '../api';
 
 export default function EventsPage({ task, navigate, setNavigationGuard, user, setUser }) {
     const [events, setEvents] = useState([]);
@@ -10,7 +11,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
     const [tab, setTab] = useState('upcoming');
 
     const load = async () => {
-        const res = await fetch(`http://localhost:3000/events?taskId=${task.id}`);
+        const res = await fetch(`${API_URL}/events?taskId=${task.id}`);
         const data = await res.json();
         data.sort((a, b) => new Date(a.date) - new Date(b.date));
         setEvents(data);
@@ -42,7 +43,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
 
 
     const handleComplete = async (id) => {
-        await fetch(`http://localhost:3000/events/${id}`, {
+        await fetch(`${API_URL}/events/${id}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ state: 'completed' })
@@ -56,7 +57,7 @@ export default function EventsPage({ task, navigate, setNavigationGuard, user, s
     };
 
     const handleDelete = async (id) => {
-        await fetch(`http://localhost:3000/events/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/events/${id}`, { method: 'DELETE' });
         setProgressMap(pm => {
             const cp = { ...pm };
             delete cp[id];
@@ -123,7 +124,7 @@ function EventRow({ item, onComplete, onDelete, navigate, reportProgress, user, 
 
     useEffect(() => {
         const load = async () => {
-            const r = await fetch(`http://localhost:3000/steps?taskId=${item.taskId}`);
+            const r = await fetch(`${API_URL}/steps?taskId=${item.taskId}`);
             const data = await r.json();
             setSteps(data);
         };

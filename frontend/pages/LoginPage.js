@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
 import { Text, TextInput, Button, Switch, Surface } from 'react-native-paper';
+import API_URL from '../api';
 
 export default function LoginPage({ onLogin }) {
   const [name, setName] = useState('');
@@ -10,7 +11,7 @@ export default function LoginPage({ onLogin }) {
   const isWide = width >= 500;
 
   const handleLogin = async () => {
-    const res = await fetch('http://localhost:3000/login', {
+    const res = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, password })
