@@ -46,7 +46,11 @@ This check is repeated automatically every hour while the server is running.
 Railway runs `npm start` by default and supplies the `PORT` environment variable.
 Attach a persistent volume so `backend/db.json` is not lost between restarts.
 
-Set the `EXPO_PUBLIC_API_URL` environment variable in the frontend so it can reach the deployed backend.
+Run `npm run build` during deployment to produce static web assets under `dist/`. The
+Express server automatically serves this directory so visiting the Railway URL
+will load the frontend. Set the `EXPO_PUBLIC_API_URL` environment variable in the
+frontend when developing locally to point at the deployed backend.
+
 
 ### Loading sample tasks
 

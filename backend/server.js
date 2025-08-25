@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const migrate = require('./scripts/migrate');
 
 const app = express();
@@ -110,6 +111,19 @@ const app = express();
     app.use(cors());
     app.use(express.json());
     require('./routes')(app, db);
+
+    const distPath = path.join(__dirname, '..', 'dist');
+    if (fs.existsSync(distPath)) {
+        app.use(express.static(distPath));
+        app.get('*', (_req, res) => {
+            res.sendFile(path.join(distPath, 'index.html'));
+        });
+    } else {
+        app.get('/', (_req, res) => {
+            res.send('Backend is running.');
+        });
+    }
+
 
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
