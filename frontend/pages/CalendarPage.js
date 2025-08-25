@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useMemo} from 'react';
 import {View, Button, StyleSheet, useWindowDimensions} from 'react-native';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
 import '../styles/calendarOverrides.css';
 import {Calendar as BigCalendar} from 'react-native-big-calendar';
 import {LOCALE} from '../utils/config';
