@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "home_chores",
+    "slug": "home_chores",
+    "platforms": ["ios", "android", "web"],
+    "web": {
+      "bundler": "webpack"
+    }
+  }
+}

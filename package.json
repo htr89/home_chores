@@ -4,7 +4,9 @@
   "description": "Deal with your own chores with a point based system",
   "main": "frontend/index.js",
   "scripts": {
-    "start": "expo start",
+    "start": "node backend/server.js",
+    "dev": "expo start",
+      "build": "EXPO_WEB_BUNDLER=webpack expo export -p web",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",

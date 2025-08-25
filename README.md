@@ -21,22 +21,34 @@ version, make sure the optional `deprecated-react-native-prop-types` package is
 installed. It is included in `package.json` and used as a polyfill in
 `frontend/index.js`.
 
-To run the application:
+To start the backend server:
 
 ```bash
 npm start
 ```
 
-The `npm start` command launches the React Native development server via [Expo](https://expo.dev/).  In a separate terminal you should run the backend server:
+This command launches the Express server. By default it listens on port 3000 but will respect the `PORT` environment variable when provided (as Railway does).
+
+To run the React Native frontend for development:
 
 ```bash
-node backend/server.js
+npm run dev
 ```
 
-The backend listens on `http://localhost:3000` to store tasks in a local JSON file.  You can open the Expo URL on your mobile device to interact with the app.
+The Expo server URL can be opened on your mobile device to interact with the app.
+
 When the server starts it immediately checks for events whose date lies in the past.
 Such events are moved to the current day and marked with the state `delayed`.
 This check is repeated automatically every hour while the server is running.
+
+### Deploying on Railway
+
+Railway runs `npm start` by default and supplies the `PORT` environment variable.
+Attach a persistent volume so `backend/db.json` is not lost between restarts.
+Run `npm run build` during deployment to produce static web assets under `dist/`. The
+Express server automatically serves this directory so visiting the Railway URL
+will load the frontend. Set the `EXPO_PUBLIC_API_URL` environment variable in the
+frontend when developing locally to point at the deployed backend.
 
 ### Loading sample tasks
 

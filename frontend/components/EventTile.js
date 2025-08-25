@@ -3,6 +3,7 @@ import { IconButton } from 'react-native-paper';
 import Tile from './Tile';
 import { EVENT_COLOR } from '../utils/colors';
 import { formatDateLocal, formatTimeLocal } from '../utils/config';
+import API_URL from '../api';
 
 export default function EventTile({
   event,
@@ -17,7 +18,7 @@ export default function EventTile({
 }) {
   const toggleFavorite = async () => {
     const fav = !(user.favorites || []).includes(event.id);
-    await fetch(`http://localhost:3000/users/${user.id}/favorites`, {
+    await fetch(`${API_URL}/users/${user.id}/favorites`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ eventId: event.id, favorite: fav }),

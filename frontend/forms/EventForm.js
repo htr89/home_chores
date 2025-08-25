@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput } from 'react-native-paper-dates';
 import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
 import { LOCALE } from '../utils/config';
+import API_URL from '../api';
 
 /**
  * Form for editing a single event.  It reuses the generic
@@ -27,7 +28,7 @@ export default function EventForm({ event, navigateBack }) {
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch('http://localhost:3000/users');
+      const res = await fetch(`${API_URL}/users`);
       const data = await res.json();
       setUsers(data);
       if (!assignedTo && data.length > 0) setAssignedTo(data[0].id);
@@ -37,7 +38,7 @@ export default function EventForm({ event, navigateBack }) {
 
   const saveEvent = async () => {
     const iso = new Date(`${date}T${time}`).toISOString();
-    await fetch(`http://localhost:3000/events/${event.id}`, {
+    await fetch(`${API_URL}/events/${event.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ date: iso, assignedTo, state }),

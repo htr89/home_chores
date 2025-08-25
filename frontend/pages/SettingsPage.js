@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Button, StyleSheet, TextInput } from 'react-native';
 import { TimePickerModal } from 'react-native-paper-dates';
 import HomeChoresFormComponent from '../components/HomeChoresFormComponent';
+import API_URL from '../api';
 
 export default function SettingsPage({ user, setUser, navigate }) {
   const [start, setStart] = useState(user.config?.workingHoursStart || '06:00');
@@ -12,7 +13,7 @@ export default function SettingsPage({ user, setUser, navigate }) {
   const [showEnd, setShowEnd] = useState(false);
 
   const save = async () => {
-    await fetch(`http://localhost:3000/users/${user.id}/config`, {
+    await fetch(`${API_URL}/users/${user.id}/config`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
